@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsMessagesSocketsClien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperSockets", "HelperSockets\HelperSockets.csproj", "{93873DDD-970F-4275-8501-32872247DF9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketServer", "SocketServer\SocketServer.csproj", "{344BB094-7EF5-4D97-A3AF-E33C4F6EF58D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{93873DDD-970F-4275-8501-32872247DF9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93873DDD-970F-4275-8501-32872247DF9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93873DDD-970F-4275-8501-32872247DF9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{344BB094-7EF5-4D97-A3AF-E33C4F6EF58D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{344BB094-7EF5-4D97-A3AF-E33C4F6EF58D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{344BB094-7EF5-4D97-A3AF-E33C4F6EF58D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{344BB094-7EF5-4D97-A3AF-E33C4F6EF58D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

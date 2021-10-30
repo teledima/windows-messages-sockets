@@ -9,10 +9,10 @@ using System.Windows.Forms;
 
 namespace WindowsMessagesSockets
 {
-    public class ActionSend : Action
+    public class SocketActionSend : SocketAction
     {
         private string _message;
-        public ActionSend(StateObject stateObject, Label label, ChangeHistoryLabel changeHistory, string message): base(stateObject, label, changeHistory)
+        public SocketActionSend(StateObject stateObject, IDisplayMessage displayMessage, string message): base(stateObject, displayMessage)
         {
             _message = message;
         }
@@ -26,15 +26,15 @@ namespace WindowsMessagesSockets
 
                 // Complete sending the data to the remote device.  
                 int bytesSent = client.EndSend(asyncResult);
-                _label.Invoke(_changeHistory, string.Format("Sent {0} bytes to server.\n", bytesSent));
+                _displayMessage.Display(string.Format("Sent {0} bytes to server.\n", bytesSent));
 
                 // Signal that all bytes have been sent.  
-                resetEvent.Set();
+                _eventManual.Set();
             }
             catch (Exception ex)
             {
                 stateObject.errorMessage = ex.Message + "\n";
-                resetEvent.Set();
+                _eventManual.Set();
             }
         }
 
@@ -46,7 +46,7 @@ namespace WindowsMessagesSockets
             // Begin sending the data to the remote device.  
             _stateObject.workSocket.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(Callback), _stateObject);
 
-            return resetEvent.WaitOne(Timeout);
+            return _eventManual.WaitOne(_timeout);
         }
     }
 }

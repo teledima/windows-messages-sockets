@@ -6,10 +6,10 @@ using System.Windows.Forms;
 
 namespace WindowsMessagesSockets
 {
-    public class ActionConnect : Action
+    public class SocketActionConnect : SocketAction
     {
         private readonly IPEndPoint _endPoint;
-        public ActionConnect(StateObject stateObject, Label label, ChangeHistoryLabel changeHistory,   IPEndPoint endPoint): base(stateObject, label, changeHistory) 
+        public SocketActionConnect(StateObject stateObject, IDisplayMessage displayMessage, IPEndPoint endPoint): base(stateObject, displayMessage) 
         {
             _endPoint = endPoint;
         }
@@ -23,23 +23,22 @@ namespace WindowsMessagesSockets
 
                 // Complete the connection.  
                 client.EndConnect(asyncResult);
-
-                _label.Invoke(_changeHistory, string.Format("Socket connected to {0}\n", client.RemoteEndPoint.ToString()));
+                _displayMessage.Display(string.Format("Socket connected to {0}\n", client.RemoteEndPoint.ToString()));
 
                 // Signal that the connection has been made.  
-                resetEvent.Set();
+                _eventManual.Set();
             }
             catch (Exception ex)
             {
                 stateObject.errorMessage = ex.Message + "\n";
-                resetEvent.Set();
+                _eventManual.Set();
             }
         }
 
         protected override bool RunAction()
         {
             _stateObject.workSocket.BeginConnect(_endPoint, new AsyncCallback(Callback), _stateObject);
-            return resetEvent.WaitOne(Timeout);
+            return _eventManual.WaitOne(_timeout);
         }
     }
 }

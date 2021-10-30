@@ -51,14 +51,15 @@ namespace WindowsMessagesSockets
 
         private void SendData(object sender, DoWorkEventArgs args)
         {
+            IDisplayMessage displayMessage = new DisplayLabel(labelHistory, updateHistory);
             try
             {
-                var client = new Client(labelHistory, changeHistory);
+                var client = new Client(displayMessage);
                 client.SendData();
             }
             catch (Exception ex)
             {
-                labelHistory.Invoke(changeHistory, ex.ToString() + '\n');
+                displayMessage.Display(ex.ToString() + '\n');
             }
         }
 
@@ -67,7 +68,7 @@ namespace WindowsMessagesSockets
             buttonSend.Enabled = true;
         }
 
-        private void changeHistoryCallback(string message)
+        private void updateHistory(string message)
         {
             labelHistory.Text += message;
         }

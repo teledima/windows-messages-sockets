@@ -1,7 +1,6 @@
 ﻿
 namespace WindowsMessagesSockets
 {
-    public delegate void ChangeHistoryLabel(string message);
     partial class MainForm
     {
         /// <summary>
@@ -30,6 +29,7 @@ namespace WindowsMessagesSockets
         /// </summary>
         private void InitializeComponent()
         {
+            this.updateLabel = new HelperSockets.updateLabelDelegate(this.updateHistory);
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.openDbFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.textBoxFileName = new System.Windows.Forms.TextBox();
@@ -135,7 +135,7 @@ namespace WindowsMessagesSockets
         private System.Windows.Forms.Button buttonSend;
         private System.Windows.Forms.Label labelHistory;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
-        private ChangeHistoryLabel changeHistory;
+        private HelperSockets.updateLabelDelegate updateLabel;
     }
 }
 
