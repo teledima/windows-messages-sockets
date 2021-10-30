@@ -29,13 +29,91 @@ namespace WindowsMessagesSockets
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.openDbFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.textBoxFileName = new System.Windows.Forms.TextBox();
+            this.buttonSelectFile = new System.Windows.Forms.Button();
+            this.labelTypeSend = new System.Windows.Forms.Label();
+            this.radioButtonSockets = new System.Windows.Forms.RadioButton();
+            this.buttonSend = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // openDbFileDialog
+            // 
+            this.openDbFileDialog.FileName = "openFileDialog1";
+            // 
+            // textBoxFileName
+            // 
+            this.textBoxFileName.Location = new System.Drawing.Point(13, 13);
+            this.textBoxFileName.Multiline = true;
+            this.textBoxFileName.Name = "textBoxFileName";
+            this.textBoxFileName.Size = new System.Drawing.Size(284, 25);
+            this.textBoxFileName.TabIndex = 0;
+            // 
+            // buttonSelectFile
+            // 
+            this.buttonSelectFile.Location = new System.Drawing.Point(323, 13);
+            this.buttonSelectFile.Name = "buttonSelectFile";
+            this.buttonSelectFile.Size = new System.Drawing.Size(111, 25);
+            this.buttonSelectFile.TabIndex = 1;
+            this.buttonSelectFile.Text = "Выбрать файл";
+            this.buttonSelectFile.UseVisualStyleBackColor = true;
+            this.buttonSelectFile.Click += new System.EventHandler(this.buttonSelectFile_Click);
+            // 
+            // labelTypeSend
+            // 
+            this.labelTypeSend.AutoSize = true;
+            this.labelTypeSend.Location = new System.Drawing.Point(13, 57);
+            this.labelTypeSend.Name = "labelTypeSend";
+            this.labelTypeSend.Size = new System.Drawing.Size(76, 13);
+            this.labelTypeSend.TabIndex = 2;
+            this.labelTypeSend.Text = "Тип отправки";
+            // 
+            // radioButtonSockets
+            // 
+            this.radioButtonSockets.AutoSize = true;
+            this.radioButtonSockets.Checked = true;
+            this.radioButtonSockets.Location = new System.Drawing.Point(16, 74);
+            this.radioButtonSockets.Name = "radioButtonSockets";
+            this.radioButtonSockets.Size = new System.Drawing.Size(64, 17);
+            this.radioButtonSockets.TabIndex = 3;
+            this.radioButtonSockets.TabStop = true;
+            this.radioButtonSockets.Text = "Sockets";
+            this.radioButtonSockets.UseVisualStyleBackColor = true;
+            // 
+            // buttonSend
+            // 
+            this.buttonSend.Location = new System.Drawing.Point(13, 98);
+            this.buttonSend.Name = "buttonSend";
+            this.buttonSend.Size = new System.Drawing.Size(425, 23);
+            this.buttonSend.TabIndex = 4;
+            this.buttonSend.Text = "Отправить";
+            this.buttonSend.UseVisualStyleBackColor = true;
+            // 
+            // MainForm
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(450, 129);
+            this.Controls.Add(this.buttonSend);
+            this.Controls.Add(this.radioButtonSockets);
+            this.Controls.Add(this.labelTypeSend);
+            this.Controls.Add(this.buttonSelectFile);
+            this.Controls.Add(this.textBoxFileName);
+            this.Name = "MainForm";
             this.Text = "Form1";
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
+
+        private System.Windows.Forms.OpenFileDialog openDbFileDialog;
+        private System.Windows.Forms.TextBox textBoxFileName;
+        private System.Windows.Forms.Button buttonSelectFile;
+        private System.Windows.Forms.Label labelTypeSend;
+        private System.Windows.Forms.RadioButton radioButtonSockets;
+        private System.Windows.Forms.Button buttonSend;
     }
 }
 
