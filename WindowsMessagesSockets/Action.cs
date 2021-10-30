@@ -13,8 +13,8 @@ namespace WindowsMessagesSockets
     {
         protected readonly Label _label;
         protected readonly ChangeHistoryLabel _changeHistory;
-        protected readonly ManualResetEvent resetEvent = new ManualResetEvent(false);
-        protected readonly StateObject _stateObject = new StateObject();
+        protected readonly ManualResetEvent resetEvent = new(false);
+        protected readonly StateObject _stateObject = new();
         protected readonly int Timeout;
         public Action(StateObject stateObject, Label label, ChangeHistoryLabel changeHistory)
         {

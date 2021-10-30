@@ -30,7 +30,6 @@ namespace WindowsMessagesSockets
         /// </summary>
         private void InitializeComponent()
         {
-            this.changeHistory = new ChangeHistoryLabel(this.changeHistoryCallback);
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.openDbFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.textBoxFileName = new System.Windows.Forms.TextBox();
@@ -120,7 +119,7 @@ namespace WindowsMessagesSockets
             this.Controls.Add(this.buttonSelectFile);
             this.Controls.Add(this.textBoxFileName);
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "Main Form";
             this.ResumeLayout(false);
             this.PerformLayout();
 
