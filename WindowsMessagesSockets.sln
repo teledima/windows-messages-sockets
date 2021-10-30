@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31727.386
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsMessagesSockets", "WindowsMessagesSockets\WindowsMessagesSockets.csproj", "{AB44DF08-D0FB-48D9-9C5B-33851B4B0654}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperSockets", "HelperSockets\HelperSockets.csproj", "{93873DDD-970F-4275-8501-32872247DF9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{AB44DF08-D0FB-48D9-9C5B-33851B4B0654}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB44DF08-D0FB-48D9-9C5B-33851B4B0654}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB44DF08-D0FB-48D9-9C5B-33851B4B0654}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93873DDD-970F-4275-8501-32872247DF9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93873DDD-970F-4275-8501-32872247DF9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93873DDD-970F-4275-8501-32872247DF9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93873DDD-970F-4275-8501-32872247DF9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

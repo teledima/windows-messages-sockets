@@ -1,6 +1,7 @@
 ﻿
 namespace WindowsMessagesSockets
 {
+    public delegate void ChangeHistoryLabel(string message);
     partial class MainForm
     {
         /// <summary>
@@ -29,13 +30,21 @@ namespace WindowsMessagesSockets
         /// </summary>
         private void InitializeComponent()
         {
+            this.changeHistory = new ChangeHistoryLabel(this.changeHistoryCallback);
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.openDbFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.textBoxFileName = new System.Windows.Forms.TextBox();
             this.buttonSelectFile = new System.Windows.Forms.Button();
             this.labelTypeSend = new System.Windows.Forms.Label();
             this.radioButtonSockets = new System.Windows.Forms.RadioButton();
             this.buttonSend = new System.Windows.Forms.Button();
+            this.labelHistory = new System.Windows.Forms.Label();
             this.SuspendLayout();
+            // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.SendData);
+            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.SendDataFinished);
             // 
             // openDbFileDialog
             // 
@@ -88,12 +97,23 @@ namespace WindowsMessagesSockets
             this.buttonSend.TabIndex = 4;
             this.buttonSend.Text = "Отправить";
             this.buttonSend.UseVisualStyleBackColor = true;
+            this.buttonSend.Click += new System.EventHandler(this.buttonSend_Click);
+            // 
+            // labelHistory
+            // 
+            this.labelHistory.AutoEllipsis = true;
+            this.labelHistory.AutoSize = true;
+            this.labelHistory.Location = new System.Drawing.Point(13, 128);
+            this.labelHistory.Name = "labelHistory";
+            this.labelHistory.Size = new System.Drawing.Size(0, 13);
+            this.labelHistory.TabIndex = 5;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(450, 129);
+            this.ClientSize = new System.Drawing.Size(450, 264);
+            this.Controls.Add(this.labelHistory);
             this.Controls.Add(this.buttonSend);
             this.Controls.Add(this.radioButtonSockets);
             this.Controls.Add(this.labelTypeSend);
@@ -114,6 +134,9 @@ namespace WindowsMessagesSockets
         private System.Windows.Forms.Label labelTypeSend;
         private System.Windows.Forms.RadioButton radioButtonSockets;
         private System.Windows.Forms.Button buttonSend;
+        private System.Windows.Forms.Label labelHistory;
+        private System.ComponentModel.BackgroundWorker backgroundWorker;
+        private ChangeHistoryLabel changeHistory;
     }
 }
 
