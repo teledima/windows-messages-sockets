@@ -15,8 +15,8 @@ namespace WindowsMessagesSockets
         public Client(IDisplayMessage displayMessage)
         {
             // Get host and port from settings
-            string host = Properties.Settings.Default["host"].ToString();
-            int port = (int)Properties.Settings.Default["port"];
+            string host = HelperSockets.Properties.Settings.Default["host"].ToString();
+            int port = (int)HelperSockets.Properties.Settings.Default["port"];
 
             // Establish the local endpoint for the socket.
             _endPoint = new IPEndPoint(IPAddress.Parse(host), port);

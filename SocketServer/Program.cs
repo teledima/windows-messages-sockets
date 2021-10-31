@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HelperSockets;
+using System;
 
 namespace SocketServer
 {
@@ -10,6 +7,10 @@ namespace SocketServer
     {
         static void Main(string[] args)
         {
+            IDisplayMessage displayMessage = new DisplayConsole();
+            new Server(displayMessage).StartListening();
+
+            Console.Read();
         }
     }
 }

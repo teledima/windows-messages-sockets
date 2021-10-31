@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsMessagesSockets
+namespace HelperSockets
 {
     public class SocketActionSend : SocketAction
     {
