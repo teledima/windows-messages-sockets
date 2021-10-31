@@ -53,6 +53,7 @@ namespace WindowsMessagesSockets
             // 
             this.textBoxFileName.Location = new System.Drawing.Point(13, 13);
             this.textBoxFileName.Multiline = true;
+            this.textBoxFileName.ReadOnly = true;
             this.textBoxFileName.Name = "textBoxFileName";
             this.textBoxFileName.Size = new System.Drawing.Size(284, 25);
             this.textBoxFileName.TabIndex = 0;
@@ -96,6 +97,7 @@ namespace WindowsMessagesSockets
             this.buttonSend.TabIndex = 4;
             this.buttonSend.Text = "Отправить";
             this.buttonSend.UseVisualStyleBackColor = true;
+            this.buttonSend.Enabled = false;
             this.buttonSend.Click += new System.EventHandler(this.buttonSend_Click);
             // 
             // labelHistory

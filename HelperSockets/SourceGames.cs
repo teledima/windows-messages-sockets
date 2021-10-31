@@ -50,6 +50,7 @@ namespace HelperSockets
             {
                 stringBuilder.Append(property.GetValue(this)?.ToString()+";");
             }
+            stringBuilder.Replace(";", "", stringBuilder.Length-1, 1);
             return stringBuilder.ToString();
         }
     }

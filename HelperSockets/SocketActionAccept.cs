@@ -69,7 +69,8 @@ namespace HelperSockets
                     content = content.Replace("<EOF>", "");
                     foreach (string row in content.Split('\n'))
                     {
-                        sourceGames.Add(SourceGamesHelper.FromString(row.Replace("\r", "")));
+                        if (!string.IsNullOrWhiteSpace(row))
+                            sourceGames.Add(SourceGamesHelper.FromString(row.Replace("\r", "")));
                     }
                     
                     _displayMessage.Display(string.Format("Read {0} bytes from socket. \nData : {1}", content.Length, content));

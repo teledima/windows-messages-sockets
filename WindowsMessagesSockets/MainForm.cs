@@ -4,14 +4,9 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using HelperSockets;
+using Microsoft.Data.Sqlite;
 
 namespace WindowsMessagesSockets
 {
@@ -32,6 +27,7 @@ namespace WindowsMessagesSockets
             {
                 textBoxFileName.Text = openDbFileDialog.SafeFileName;
                 db_file_path = openDbFileDialog.FileName;
+                buttonSend.Enabled = true;
             }
         }
 
@@ -39,8 +35,11 @@ namespace WindowsMessagesSockets
         {
             try
             {
-                backgroundWorker.RunWorkerAsync();
-                buttonSend.Enabled = false;
+                if (!string.IsNullOrEmpty(db_file_path))
+                {
+                    backgroundWorker.RunWorkerAsync();
+                    buttonSend.Enabled = false;
+                }
             }
             catch (Exception ex)
             {
@@ -52,15 +51,19 @@ namespace WindowsMessagesSockets
         private void SendData(object sender, DoWorkEventArgs args)
         {
             IDisplayMessage displayMessage = new DisplayLabel(labelHistory, updateHistory);
-            var sourceGames = SourceGamesHelper.GetSource(db_file_path).Result;
+
             try
             {
+                var sourceGames = SourceGamesHelper.GetSource(db_file_path).Result;
                 var client = new Client(displayMessage);
                 client.SendData(sourceGames);
             }
             catch (Exception ex)
             {
-                displayMessage.Display(ex.ToString() + '\n');
+                if (ex.InnerException != null)
+                    displayMessage.Display(ex.InnerException.Message + '\n');
+                else
+                    displayMessage.Display(ex.Message + '\n');
             }
         }
 
