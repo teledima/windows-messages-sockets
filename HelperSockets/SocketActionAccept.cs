@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Threading;
 using System.Text;
+using System.Collections.Generic;
 
 namespace HelperSockets
 {
@@ -19,7 +20,7 @@ namespace HelperSockets
             Socket listener = (Socket)asyncResult.AsyncState;
             Socket handler = listener.EndAccept(asyncResult);
             // Create the state object.  
-            StateObject state = new StateObject
+            StateObject state = new()
             {
                 workSocket = handler
             };
@@ -62,11 +63,17 @@ namespace HelperSockets
                 content = state.sb.ToString();
                 if (content.IndexOf("<EOF>") > -1)
                 {
-                    // All the data has been read from the
-                    // client. Display it.  
-                    _displayMessage.Display(string.Format("Read {0} bytes from socket. \n Data : {1}", content.Length, content));
+                    // All the data has been read from the client.
+                    // Parse string to list
+                    List<SourceGames> sourceGames = new();
+                    content = content.Replace("<EOF>", "");
+                    foreach (string row in content.Split('\n'))
+                    {
+                        sourceGames.Add(SourceGamesHelper.FromString(row.Replace("\r", "")));
+                    }
+                    
+                    _displayMessage.Display(string.Format("Read {0} bytes from socket. \nData : {1}", content.Length, content));
 
-                    Thread.Sleep(1000 * 6);
                     // Echo the data back to the client. 
                     Send(handler, content);
                 }

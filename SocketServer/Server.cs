@@ -7,8 +7,8 @@ namespace SocketServer
 {
     public class Server
     {
-        private IPEndPoint _endPoint;
-        private IDisplayMessage _displayMessage;
+        private readonly IPEndPoint _endPoint;
+        private readonly IDisplayMessage _displayMessage;
         public Server(IDisplayMessage displayMessage)
         {
             string host = HelperSockets.Properties.Settings.Default["host"].ToString();

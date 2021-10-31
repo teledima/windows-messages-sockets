@@ -2,6 +2,7 @@
 
 using HelperSockets;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
@@ -23,7 +24,7 @@ namespace WindowsMessagesSockets
             _displayMessage = displayMessage;
         }
 
-        public void SendData()
+        public void SendData(IEnumerable<SourceGames> sourceGames)
         {
             try
             {
@@ -41,7 +42,7 @@ namespace WindowsMessagesSockets
                     return;
 
                 // Send test data to the remote device.  
-                _actionResult = new SocketActionSend(_stateObject, _displayMessage, "This is a test<EOF>").Run();
+                _actionResult = new SocketActionSend(_stateObject, _displayMessage, SourceGamesHelper.GetBytes(sourceGames)).Run();
                 if (!_actionResult)
                     return;
 

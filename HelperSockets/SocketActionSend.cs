@@ -11,10 +11,10 @@ namespace HelperSockets
 {
     public class SocketActionSend : SocketAction
     {
-        private string _message;
-        public SocketActionSend(StateObject stateObject, IDisplayMessage displayMessage, string message): base(stateObject, displayMessage)
+        private readonly byte[] _data;
+        public SocketActionSend(StateObject stateObject, IDisplayMessage displayMessage, byte[] data): base(stateObject, displayMessage)
         {
-            _message = message;
+            _data = data;
         }
         protected override void Callback(IAsyncResult asyncResult)
         {
@@ -40,11 +40,8 @@ namespace HelperSockets
 
         protected override bool RunAction()
         {
-            // Convert the string data to byte data using ASCII encoding.  
-            byte[] byteData = Encoding.ASCII.GetBytes(_message);
-
             // Begin sending the data to the remote device.  
-            _stateObject.workSocket.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(Callback), _stateObject);
+            _stateObject.workSocket.BeginSend(_data, 0, _data.Length, 0, new AsyncCallback(Callback), _stateObject);
 
             return _eventManual.WaitOne(_timeout);
         }

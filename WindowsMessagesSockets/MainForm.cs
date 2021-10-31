@@ -17,7 +17,7 @@ namespace WindowsMessagesSockets
 {
     public partial class MainForm : Form
     {
-        private string initial_directory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+        private readonly string initial_directory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
         private string db_file_path;
         public MainForm()
         {
@@ -52,10 +52,11 @@ namespace WindowsMessagesSockets
         private void SendData(object sender, DoWorkEventArgs args)
         {
             IDisplayMessage displayMessage = new DisplayLabel(labelHistory, updateHistory);
+            var sourceGames = SourceGamesHelper.GetSource(db_file_path).Result;
             try
             {
                 var client = new Client(displayMessage);
-                client.SendData();
+                client.SendData(sourceGames);
             }
             catch (Exception ex)
             {
