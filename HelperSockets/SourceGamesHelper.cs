@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Collections.Generic;
 using System.Text;
+using Npgsql;
 
 namespace HelperSockets
 {
@@ -46,6 +47,12 @@ namespace HelperSockets
                 AchievementName = string.IsNullOrEmpty(values[10]) ? null : values[10],
                 AchievementGameId = string.IsNullOrEmpty(values[11]) ? null : int.Parse(values[11])
             };
+        }
+
+        public async static void ExportToPostgres(List<SourceGames> sourceGames)
+        {
+            using var connection = new NpgsqlConnection(Properties.Settings.Default["connection_string"].ToString());
+            await connection.OpenAsync();
         }
     }
 }

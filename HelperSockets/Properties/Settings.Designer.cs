@@ -49,5 +49,14 @@ namespace HelperSockets.Properties {
                 return ((int)(this["port"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Host=localhost;Port=5432;Database=games;Username=postgres;Password=postgres;")]
+        public string connection_string {
+            get {
+                return ((string)(this["connection_string"]));
+            }
+        }
     }
 }

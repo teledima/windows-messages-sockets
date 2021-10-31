@@ -72,8 +72,11 @@ namespace HelperSockets
                         if (!string.IsNullOrWhiteSpace(row))
                             sourceGames.Add(SourceGamesHelper.FromString(row.Replace("\r", "")));
                     }
+
+                    // Export data
+                    SourceGamesHelper.ExportToPostgres(sourceGames);
                     
-                    _displayMessage.Display(string.Format("Read {0} bytes from socket. \nData : {1}", content.Length, content));
+                    _displayMessage.Display(string.Format("Read {0} bytes from socket.", content.Length));
 
                     // Echo the data back to the client. 
                     Send(handler, content);
