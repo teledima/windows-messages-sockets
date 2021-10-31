@@ -55,6 +55,8 @@
     <Compile Include="DisplayConsole.cs" />
     <Compile Include="IDisplayMessage.cs" />
     <Compile Include="DisplayLabel.cs" />
+    <Compile Include="SourceGames.cs" />
+    <Compile Include="SourceGamesHelper.cs" />
     <Compile Include="StateObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
