@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HelperSockets
 {
@@ -39,7 +40,10 @@ namespace HelperSockets
 
         public static void ExportToPostgres(List<SourceGames> sourceGames)
         {
-            
+            using var db = new GamesContext();
+            var game = db.Games.FirstOrDefault();
+            var categories = game.GamesCategories.Select(gameCategory => gameCategory.Category);
+            var a = 5;
         }
     }
 }

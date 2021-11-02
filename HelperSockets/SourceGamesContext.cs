@@ -10,6 +10,7 @@ namespace HelperSockets
         public string Filepath { get; private set; }
         public SourceGamesContext(string filepath) : base()
         {
+            SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_winsqlite3());
             Filepath = filepath;
         }
 
@@ -18,6 +19,11 @@ namespace HelperSockets
             optionsBuilder
                 .UseSqlite(string.Format("Data Source = {0}", Filepath))
                 .UseSnakeCaseNamingConvention();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SourceGames>().HasNoKey();
         }
     }
 

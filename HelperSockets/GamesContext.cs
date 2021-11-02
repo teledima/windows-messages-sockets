@@ -55,15 +55,37 @@ namespace HelperSockets
                 .HasIndex(downloadableContent => downloadableContent.Name)
                 .HasName("downloadable_contens_name_uniq")
                 .IsUnique();
+
+            // Relations
+            modelBuilder.Entity<GamesCategory>()
+                .HasOne(gameCategory => gameCategory.Game)
+                .WithMany(game => game.GamesCategories)
+                .HasForeignKey(gameCategory => gameCategory.GameId);
+
+            modelBuilder.Entity<GamesCategory>()
+                .HasOne(gameCategory => gameCategory.Category)
+                .WithMany(category => category.GamesCategories)
+                .HasForeignKey(gameCategory => gameCategory.CategoryId);
+
+            modelBuilder.Entity<Achievement>()
+                .HasOne(achievement => achievement.Game)
+                .WithMany(game => game.Achievements)
+                .HasForeignKey(achievement => achievement.GameId);
+
+            modelBuilder.Entity<DownloadableContents>()
+                .HasOne(downloadableContent => downloadableContent.Game)
+                .WithMany(game => game.DownloadableContents)
+                .HasForeignKey(downloadableContent => downloadableContent.GameId);
         }
     }
     public class Games
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<Category> Categories { get; set; }
 
         public List<GamesCategory> GamesCategories { get; set; }
+        public List<Achievement> Achievements { get; set; }
+        public List<DownloadableContents> DownloadableContents { get; set; }
     }
     public class Category
     {
@@ -85,11 +107,13 @@ namespace HelperSockets
         public int Id { get; set; }
         public string Name { get; set; }
         public int GameId { get; set; }
+        public Games Game { get; set; }
     }
     public class DownloadableContents
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int GameId { get; set; }
+        public Games Game { get; set; }
     }
 }

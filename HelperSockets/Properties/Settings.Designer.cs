@@ -49,5 +49,14 @@ namespace HelperSockets.Properties {
                 return ((int)(this["port"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6000")]
+        public int timeout {
+            get {
+                return ((int)(this["timeout"]));
+            }
+        }
     }
 }
