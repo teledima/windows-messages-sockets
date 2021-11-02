@@ -32,11 +32,11 @@ namespace HelperSockets
     {
         public string GamesName { get; set; }
 
-        public string CategoryName { get; set; }
+        public string CategoriesName { get; set; }
 
         public string DownloadableContentsName { get; set; }
 
-        public string AchievementName { get; set; }
+        public string AchievementsName { get; set; }
 
         public override string ToString()
         {

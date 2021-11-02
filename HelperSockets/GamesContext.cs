@@ -1,15 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System.Collections.Generic;
 
 namespace HelperSockets
 {
     public class GamesContext: DbContext
     {
-        public DbSet<Games> Games;
-        public DbSet<Category> Categories;
-        public DbSet<GamesCategory> GamesCategories;
-        public DbSet<Achievement> Achievements;
-        public DbSet<DownloadableContents> DownloadableContents;
+        public DbSet<Games> Games { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<GamesCategory> GamesCategories { get; set; }
+        public DbSet<Achievement> Achievements { get; set; }
+        public DbSet<DownloadableContents> DownloadableContents { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
@@ -91,7 +93,6 @@ namespace HelperSockets
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<Games> Games { get; set; }
 
         public List<GamesCategory> GamesCategories { get; set; }
     }

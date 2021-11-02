@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="postgres_connection_string" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres;</Value>
+      <Value Profile="(Default)">Host=localhost;Port=5432;Database=games;Username=postgres;Password=postgres;</Value>
     </Setting>
     <Setting Name="host" Type="System.String" Scope="Application">
       <Value Profile="(Default)">127.0.0.1</Value>

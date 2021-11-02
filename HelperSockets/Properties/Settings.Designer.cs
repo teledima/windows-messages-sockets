@@ -25,7 +25,7 @@ namespace HelperSockets.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres;")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Host=localhost;Port=5432;Database=games;Username=postgres;Password=postgres;")]
         public string postgres_connection_string {
             get {
                 return ((string)(this["postgres_connection_string"]));

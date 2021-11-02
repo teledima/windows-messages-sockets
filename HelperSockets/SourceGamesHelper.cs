@@ -32,9 +32,9 @@ namespace HelperSockets
             return new SourceGames()
             {
                 GamesName = string.IsNullOrEmpty(values[0]) ? null : values[0],
-                CategoryName = string.IsNullOrEmpty(values[1]) ? null : values[1],
+                CategoriesName = string.IsNullOrEmpty(values[1]) ? null : values[1],
                 DownloadableContentsName = string.IsNullOrEmpty(values[2]) ? null : values[2],
-                AchievementName = string.IsNullOrEmpty(values[3]) ? null : values[3],
+                AchievementsName = string.IsNullOrEmpty(values[3]) ? null : values[3],
             };
         }
 
@@ -42,8 +42,6 @@ namespace HelperSockets
         {
             using var db = new GamesContext();
             var game = db.Games.FirstOrDefault();
-            var categories = game.GamesCategories.Select(gameCategory => gameCategory.Category);
-            var a = 5;
         }
     }
 }
