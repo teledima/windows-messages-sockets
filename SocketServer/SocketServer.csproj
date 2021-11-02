@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HelperSockets\HelperSockets.csproj">
-      <Project>{b465713b-c4c2-43d1-9260-f19920f6ce37}</Project>
+      <Project>{74f58edf-afa2-4127-9181-35865ee90494}</Project>
       <Name>HelperSockets</Name>
     </ProjectReference>
   </ItemGroup>

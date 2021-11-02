@@ -9,6 +9,7 @@
     <RootNamespace>WindowsMessagesSockets</RootNamespace>
     <AssemblyName>WindowsMessagesSockets</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+	<LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -79,6 +80,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HelperSockets\HelperSockets.csproj">
+      <Project>{74f58edf-afa2-4127-9181-35865ee90494}</Project>
+      <Name>HelperSockets</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
