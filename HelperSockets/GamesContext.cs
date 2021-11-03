@@ -45,12 +45,12 @@ namespace HelperSockets
 
             modelBuilder.Entity<Category>()
                 .HasIndex(category => category.Name)
-                .HasName("category_name_uniq")
+                .HasName("categories_name_uniq")
                 .IsUnique();
 
             modelBuilder.Entity<Achievement>()
                 .HasIndex(achievement => achievement.Name)
-                .HasName("achievement_name_uniq")
+                .HasName("achievements_name_uniq")
                 .IsUnique();
 
             modelBuilder.Entity<DownloadableContents>()
@@ -85,7 +85,7 @@ namespace HelperSockets
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public List<GamesCategory> GamesCategories { get; set; }
+        public List<GamesCategory> GamesCategories{ get; set; }
         public List<Achievement> Achievements { get; set; }
         public List<DownloadableContents> DownloadableContents { get; set; }
     }
