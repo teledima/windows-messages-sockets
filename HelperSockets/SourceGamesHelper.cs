@@ -61,8 +61,6 @@ namespace HelperSockets
                 if (game == null)
                     game = db.Games.Add(new Games() { Name = sourceGame.GamesName }).Entity;
 
-                // db.SaveChanges();
-
                 var gameCategory = db.GamesCategories
                     .Include(gameCategory => gameCategory.Game)
                     .Include(gameCategory => gameCategory.Category)
@@ -88,10 +86,7 @@ namespace HelperSockets
                     if (downloadableContent == null)
                         db.DownloadableContents.Add(new DownloadableContents() { Name = sourceGame.DownloadableContentsName, Game = game });
                 }
-
-                db.SaveChanges();
             }
-
             db.SaveChanges();
         }
     }
