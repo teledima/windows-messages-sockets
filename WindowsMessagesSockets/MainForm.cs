@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using HelperSockets;
+using System.Threading.Tasks;
 
 namespace WindowsMessagesSockets
 {

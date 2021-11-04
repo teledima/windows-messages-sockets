@@ -20,7 +20,8 @@ namespace HelperSockets
             StringBuilder stringBuilder = new();
             foreach (SourceGames game in sourceGames)
             {
-                stringBuilder.AppendLine(game.ToString());
+                if (game != null)
+                    stringBuilder.AppendLine(game.ToString());
             }
             stringBuilder.Append("<EOF>");
             return Encoding.ASCII.GetBytes(stringBuilder.ToString()); ;
@@ -38,56 +39,81 @@ namespace HelperSockets
             };
         }
 
-        public static void ExportToPostgres(List<SourceGames> sourceGames)
+        public async static void ExportToPostgres(List<SourceGames> sourceGames)
         {
             using var db = new GamesContext();
-
             foreach (var sourceGame in sourceGames) 
-            {
-                Category category = new();
+            {    
+                Category category = default;
+
                 if (!string.IsNullOrEmpty(sourceGame.CategoriesName))
                 {
-                    category = db.Categories.ToList().Find(category => category.Name == sourceGame.CategoriesName);
+                    var categories = await db.Categories.ToListAsync();
+                    category = categories.Find(category => category.Name.ToLower() == sourceGame.CategoriesName.ToLower());
 
                     if (category == null)
-                        category = db.Categories.Add(new Category() { Name = sourceGame.CategoriesName }).Entity;
+                    {
+                        var add_result = await db.Categories.AddAsync(new Category() { Name = sourceGame.CategoriesName });
+                        category = add_result.Entity;
+                    }
                 }
 
-                if (string.IsNullOrEmpty(sourceGame.GamesName))
-                    continue;
-
-                var game = db.Games.ToList().Find(game => game.Name == sourceGame.GamesName);
-
-                if (game == null)
-                    game = db.Games.Add(new Games() { Name = sourceGame.GamesName }).Entity;
-
-                var gameCategory = db.GamesCategories
-                    .Include(gameCategory => gameCategory.Game)
-                    .Include(gameCategory => gameCategory.Category)
-                    .ToList()
-                    .Find(gameCategory => gameCategory.Game == game && gameCategory.Category == category);
-
-                if (gameCategory == null)
-                    gameCategory = db.GamesCategories.Add(new GamesCategory() { Game = game, Category = category }).Entity;
-
-
-                if (!string.IsNullOrEmpty(sourceGame.AchievementsName))
+                if (!string.IsNullOrEmpty(sourceGame.GamesName))
                 {
-                    var achievement = db.Achievements.ToList().Find(achievement => achievement.Name == sourceGame.AchievementsName);
 
-                    if (achievement == null)
-                        db.Achievements.Add(new Achievement() { Name = sourceGame.AchievementsName, Game = game });
+                    var games = await db.Games.ToListAsync();
+                    var game = games.Find(game => game.Name.ToLower() == sourceGame.GamesName.ToLower());
+
+                    if (game == null)
+                    {
+                        var add_result = await db.Games.AddAsync(new Games() { Name = sourceGame.GamesName });
+                        game = add_result.Entity;
+                    }
+
+                    var gameCategories = await db.GamesCategories
+                                                .Include(gameCategory => gameCategory.Game)
+                                                .Include(gameCategory => gameCategory.Category)
+                                                .ToListAsync();
+
+                    if (category != null)
+                    {
+                        var gameCategory = gameCategories.Find(gameCategory => gameCategory.Game == game && gameCategory.Category == category);
+
+                        if (gameCategory == null)
+                        {
+                            var add_result = await db.GamesCategories.AddAsync(new GamesCategory() { Game = game, Category = category });
+                            gameCategory = add_result.Entity;
+                        }
+                    }
+
+
+                    if (!string.IsNullOrEmpty(sourceGame.AchievementsName))
+                    {
+                        var achievements = await db.Achievements.ToListAsync();
+                        var achievement = achievements.Find(achievement => achievement.Name.ToLower() == sourceGame.AchievementsName.ToLower());
+
+                        if (achievement == null)
+                            await db.Achievements.AddAsync(new Achievement() { Name = sourceGame.AchievementsName, Game = game });
+                    }
+
+                    if (!string.IsNullOrEmpty(sourceGame.DownloadableContentsName))
+                    {
+                        var downloadableContents = await db.DownloadableContents.ToListAsync();
+                        var downloadableContent = downloadableContents.Find(downloadableContent => downloadableContent.Name.ToLower() == sourceGame.DownloadableContentsName.ToLower());
+
+                        if (downloadableContent == null)
+                            await db.DownloadableContents.AddAsync(new DownloadableContents() { Name = sourceGame.DownloadableContentsName, Game = game });
+                    }
                 }
-
-                if (!string.IsNullOrEmpty(sourceGame.DownloadableContentsName))
-                {
-                    var downloadableContent = db.DownloadableContents.ToList().Find(downloadableContent => downloadableContent.Name == sourceGame.DownloadableContentsName);
-
-                    if (downloadableContent == null)
-                        db.DownloadableContents.Add(new DownloadableContents() { Name = sourceGame.DownloadableContentsName, Game = game });
-                }
+                await db.SaveChangesAsync();
             }
-            db.SaveChanges();
+        }
+
+        public static void ClearSourceGames(string filepath)
+        {
+            var db = new SourceGamesContext(filepath);
+            db.SourceGames.RemoveRange(db.SourceGames);
+            db.SaveChangesAsync();
         }
     }
 }
