@@ -70,6 +70,7 @@ namespace WindowsMessagesSockets
         private void SendDataFinished(object sender, RunWorkerCompletedEventArgs args)
         {
             buttonSend.Enabled = true;
+            Task.Run(() => SourceGamesHelper.ClearSourceGames(db_file_path));
         }
 
         private void updateHistory(string message)

@@ -41,6 +41,7 @@ namespace HelperSockets
 
         public async static void ExportToPostgres(List<SourceGames> sourceGames)
         {
+            // export order: Category -> Game -> GameCategory -> Achievement -> DownloadableContent
             using var db = new GamesContext();
             foreach (var sourceGame in sourceGames) 
             {    
@@ -51,6 +52,7 @@ namespace HelperSockets
                     var categories = await db.Categories.ToListAsync();
                     category = categories.Find(category => category.Name.ToLower() == sourceGame.CategoriesName.ToLower());
 
+                    // if we didn't find a category, insert a new one
                     if (category == null)
                     {
                         var add_result = await db.Categories.AddAsync(new Category() { Name = sourceGame.CategoriesName });
@@ -58,12 +60,14 @@ namespace HelperSockets
                     }
                 }
 
+                // Game, GameCategory, Achievement, DownloadableContent depend on the Game key, so we check if there is a name else skip
                 if (!string.IsNullOrEmpty(sourceGame.GamesName))
                 {
 
                     var games = await db.Games.ToListAsync();
                     var game = games.Find(game => game.Name.ToLower() == sourceGame.GamesName.ToLower());
 
+                    // if we didn't find a game, insert a new one
                     if (game == null)
                     {
                         var add_result = await db.Games.AddAsync(new Games() { Name = sourceGame.GamesName });
@@ -75,6 +79,7 @@ namespace HelperSockets
                                                 .Include(gameCategory => gameCategory.Category)
                                                 .ToListAsync();
 
+                    // if sourceGame.CategoriesName is null then category the variable will remain null and we will try to insert a new category, which will result in an error
                     if (category != null)
                     {
                         var gameCategory = gameCategories.Find(gameCategory => gameCategory.Game == game && gameCategory.Category == category);
@@ -92,6 +97,7 @@ namespace HelperSockets
                         var achievements = await db.Achievements.ToListAsync();
                         var achievement = achievements.Find(achievement => achievement.Name.ToLower() == sourceGame.AchievementsName.ToLower());
 
+                        // if we didn't find a achievement, insert a new one
                         if (achievement == null)
                             await db.Achievements.AddAsync(new Achievement() { Name = sourceGame.AchievementsName, Game = game });
                     }
@@ -101,10 +107,12 @@ namespace HelperSockets
                         var downloadableContents = await db.DownloadableContents.ToListAsync();
                         var downloadableContent = downloadableContents.Find(downloadableContent => downloadableContent.Name.ToLower() == sourceGame.DownloadableContentsName.ToLower());
 
+                        // if we didn't find a downloadable content, insert a new one
                         if (downloadableContent == null)
                             await db.DownloadableContents.AddAsync(new DownloadableContents() { Name = sourceGame.DownloadableContentsName, Game = game });
                     }
                 }
+                // save changes for each row
                 await db.SaveChangesAsync();
             }
         }

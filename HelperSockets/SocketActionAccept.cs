@@ -73,8 +73,15 @@ namespace HelperSockets
                             sourceGames.Add(SourceGamesHelper.FromString(row.Replace("\r", "")));
                     }
 
-                    // Export data
-                    Task.Run(() => SourceGamesHelper.ExportToPostgres(sourceGames));
+                    try
+                    {
+                        // Export data
+                        Task.Run(() => SourceGamesHelper.ExportToPostgres(sourceGames));
+                    }
+                    catch(Exception e)
+                    {
+                        _displayMessage.Display(e.Message);
+                    }
 
                     _displayMessage.Display(string.Format("Read {0} bytes from socket.", content.Length));
 
