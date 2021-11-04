@@ -2,8 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="HelperSockets.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="timeout" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">6000</Value>
+    <Setting Name="postgres_connection_string" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Host=localhost;Port=5432;Database=games;Username=postgres;Password=postgres;</Value>
     </Setting>
     <Setting Name="host" Type="System.String" Scope="Application">
       <Value Profile="(Default)">127.0.0.1</Value>
@@ -11,8 +11,8 @@
     <Setting Name="port" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">11000</Value>
     </Setting>
-    <Setting Name="connection_string" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Host=localhost;Port=5432;Database=games;Username=postgres;Password=postgres;</Value>
+    <Setting Name="timeout" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">6000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

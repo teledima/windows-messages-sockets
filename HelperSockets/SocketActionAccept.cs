@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Text;
 using System.Collections.Generic;
 
@@ -74,8 +74,8 @@ namespace HelperSockets
                     }
 
                     // Export data
-                    SourceGamesHelper.ExportToPostgres(sourceGames);
-                    
+                    Task.Run(() => SourceGamesHelper.ExportToPostgres(sourceGames));
+
                     _displayMessage.Display(string.Format("Read {0} bytes from socket.", content.Length));
 
                     // Echo the data back to the client. 

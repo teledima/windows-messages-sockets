@@ -1,21 +1,18 @@
-﻿using Microsoft.Data.Sqlite;
-using System.Threading.Tasks;
-using Dapper;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-using Npgsql;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HelperSockets
 {
     public static class SourceGamesHelper
     {
-        public async static Task<IEnumerable<SourceGames>> GetSource(string filepath)
+        public async static Task<IList<SourceGames>> GetSource(string filepath)
         {
-            using var connection = new SqliteConnection(string.Format("Data Source={0};Mode=ReadWrite", filepath));
-            SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_winsqlite3());
-            await connection.OpenAsync();
+            using var db = new SourceGamesContext(filepath);
 
-            return await connection.GetListAsync<SourceGames>();
+            return await db.SourceGames.ToListAsync();
         }
 
         public static byte[] GetBytes(IEnumerable<SourceGames> sourceGames)
@@ -34,25 +31,63 @@ namespace HelperSockets
             string[] values = data.Split(';');
             return new SourceGames()
             {
-                GamesId = int.Parse(values[0]),
-                GamesName = values[1],
-                GamesCategoryGameId = int.Parse(values[2]),
-                GamesCategoryCategoryId = int.Parse(values[3]),
-                CategoryId = int.Parse(values[4]),
-                CategoryName = values[5],
-                DownloadableContentsId = string.IsNullOrEmpty(values[6]) ? null : int.Parse(values[6]),
-                DownloadableContentsName = string.IsNullOrEmpty(values[7]) ? null : values[7],
-                DownloadableContentsGameId = string.IsNullOrEmpty(values[8]) ? null : int.Parse(values[8]),
-                AchievementId = string.IsNullOrEmpty(values[9]) ? null : int.Parse(values[9]),
-                AchievementName = string.IsNullOrEmpty(values[10]) ? null : values[10],
-                AchievementGameId = string.IsNullOrEmpty(values[11]) ? null : int.Parse(values[11])
+                GamesName = string.IsNullOrEmpty(values[0]) ? null : values[0],
+                CategoriesName = string.IsNullOrEmpty(values[1]) ? null : values[1],
+                DownloadableContentsName = string.IsNullOrEmpty(values[2]) ? null : values[2],
+                AchievementsName = string.IsNullOrEmpty(values[3]) ? null : values[3],
             };
         }
 
-        public async static void ExportToPostgres(List<SourceGames> sourceGames)
+        public static void ExportToPostgres(List<SourceGames> sourceGames)
         {
-            using var connection = new NpgsqlConnection(Properties.Settings.Default["connection_string"].ToString());
-            await connection.OpenAsync();
+            using var db = new GamesContext();
+
+            foreach (var sourceGame in sourceGames) 
+            {
+                Category category = new();
+                if (!string.IsNullOrEmpty(sourceGame.CategoriesName))
+                {
+                    category = db.Categories.ToList().Find(category => category.Name == sourceGame.CategoriesName);
+
+                    if (category == null)
+                        category = db.Categories.Add(new Category() { Name = sourceGame.CategoriesName }).Entity;
+                }
+
+                if (string.IsNullOrEmpty(sourceGame.GamesName))
+                    continue;
+
+                var game = db.Games.ToList().Find(game => game.Name == sourceGame.GamesName);
+
+                if (game == null)
+                    game = db.Games.Add(new Games() { Name = sourceGame.GamesName }).Entity;
+
+                var gameCategory = db.GamesCategories
+                    .Include(gameCategory => gameCategory.Game)
+                    .Include(gameCategory => gameCategory.Category)
+                    .ToList()
+                    .Find(gameCategory => gameCategory.Game == game && gameCategory.Category == category);
+
+                if (gameCategory == null)
+                    gameCategory = db.GamesCategories.Add(new GamesCategory() { Game = game, Category = category }).Entity;
+
+
+                if (!string.IsNullOrEmpty(sourceGame.AchievementsName))
+                {
+                    var achievement = db.Achievements.ToList().Find(achievement => achievement.Name == sourceGame.AchievementsName);
+
+                    if (achievement == null)
+                        db.Achievements.Add(new Achievement() { Name = sourceGame.AchievementsName, Game = game });
+                }
+
+                if (!string.IsNullOrEmpty(sourceGame.DownloadableContentsName))
+                {
+                    var downloadableContent = db.DownloadableContents.ToList().Find(downloadableContent => downloadableContent.Name == sourceGame.DownloadableContentsName);
+
+                    if (downloadableContent == null)
+                        db.DownloadableContents.Add(new DownloadableContents() { Name = sourceGame.DownloadableContentsName, Game = game });
+                }
+            }
+            db.SaveChanges();
         }
     }
 }
