@@ -49,7 +49,7 @@ namespace WindowsMessagesSockets
                     return;
 
                 // Send test data to the remote device.  
-                _actionResult = new SocketActionSend(_stateObject, _displayMessage, SourceGamesHelper.Encrypt(sourceGames, _stateObject.key)).Run();
+                _actionResult = new SocketActionSend(_stateObject, _displayMessage, "Send {0} bytes to server.\n", SourceGamesHelper.Encrypt(sourceGames, _stateObject.key)).Run();
                 if (!_actionResult)
                     return;
 

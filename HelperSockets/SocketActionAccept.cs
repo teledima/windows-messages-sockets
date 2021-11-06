@@ -25,15 +25,25 @@ namespace HelperSockets
             var stateObject = (StateObject)asyncResult.AsyncState;
             Socket listener = stateObject.workSocket;
             Socket handler = listener.EndAccept(asyncResult);
+
             // Create the state object.  
             StateObject state = new()
             {
-                workSocket = handler,
-                typeAccept = TypeAccept.ImportData
+                workSocket = handler
             };
 
-            Send(handler, _rsa.ToXmlString(false), _stateObject.typeAccept);
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
+            state.typeAccept = TypeAccept.SendKey;
+            new SocketActionSend(
+                state,
+                _displayMessage, "Send {0} bytes to client.", 
+                Encoding.ASCII.GetBytes(_rsa.ToXmlString(false))
+            ).Run();
+
+            state.typeAccept = TypeAccept.ImportData;
+            handler.BeginReceive(
+                state.buffer, 0, StateObject.BufferSize, 0, 
+                new AsyncCallback(ReadCallback), 
+                state);
         }
 
         protected override bool RunAction()
@@ -91,43 +101,8 @@ namespace HelperSockets
 
                 _displayMessage.Display(string.Format("Read {0} bytes from socket.", state.data.Count));
 
-                Send(handler, state.data.Count.ToString(), state.typeAccept);
-            }
-        }
 
-        private void Send(Socket handler, string data, TypeAccept typeAccept)
-        {
-            // Convert the string data to byte data using ASCII encoding.  
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
-
-            // Begin sending the data to the remote device.  
-            handler.BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(SendCallback), new StateObject { workSocket = handler, typeAccept = typeAccept });
-        }
-
-        private void SendCallback(IAsyncResult ar)
-        {
-            try
-            {
-                var stateObject = (StateObject)ar.AsyncState;
-                // Retrieve the socket from the state object.  
-                Socket handler = stateObject.workSocket;
-
-                // Complete sending the data to the remote device.  
-                int bytesSent = handler.EndSend(ar);
-
-                _displayMessage.Display(string.Format("Sent {0} bytes to client.", bytesSent));
-
-                if (stateObject.typeAccept == TypeAccept.ImportData)
-                {
-                    handler.Shutdown(SocketShutdown.Both);
-                    handler.Close();
-                }
-
-            }
-            catch (Exception e)
-            {
-                _displayMessage.Display(e.Message);
+                new SocketActionSend(state, _displayMessage, "Send {0} bytes to client.", Encoding.ASCII.GetBytes(state.data.Count.ToString())).Run();
             }
         }
 

@@ -12,9 +12,11 @@ namespace HelperSockets
     public class SocketActionSend : SocketAction
     {
         private readonly byte[] _data;
-        public SocketActionSend(StateObject stateObject, IDisplayMessage displayMessage, byte[] data): base(stateObject, displayMessage)
+        private readonly string _displayPattern;
+        public SocketActionSend(StateObject stateObject, IDisplayMessage displayMessage, string displayPattern, byte[] data): base(stateObject, displayMessage)
         {
             _data = data;
+            _displayPattern = displayPattern;
         }
         protected override void Callback(IAsyncResult asyncResult)
         {
@@ -26,7 +28,7 @@ namespace HelperSockets
 
                 // Complete sending the data to the remote device.  
                 int bytesSent = client.EndSend(asyncResult);
-                _displayMessage.Display(string.Format("Sent {0} bytes to server.\n", _data.Length));
+                _displayMessage.Display(string.Format(_displayPattern, _data.Length));
 
                 // Signal that all bytes have been sent.  
                 _eventManual.Set();
