@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace WindowsMessagesSockets
 {
@@ -41,15 +42,25 @@ namespace WindowsMessagesSockets
                 if (!_actionResult)
                     return;
 
+                // Receive rsa public key 
+                _stateObject.typeAccept = TypeAccept.SendKey;
+                _actionResult = new SocketActionReceive(_stateObject, _displayMessage).Run();
+                if (!_actionResult)
+                    return;
+
                 // Send test data to the remote device.  
-                _actionResult = new SocketActionSend(_stateObject, _displayMessage, SourceGamesHelper.GetBytes(sourceGames)).Run();
+                _actionResult = new SocketActionSend(_stateObject, _displayMessage, SourceGamesHelper.Encrypt(sourceGames, _stateObject.key)).Run();
                 if (!_actionResult)
                     return;
 
                 // Receive the response from the remote device.  
+                _stateObject.typeAccept = TypeAccept.ImportData;
                 _actionResult = new SocketActionReceive(_stateObject, _displayMessage).Run();
                 if (!_actionResult)
                     return;
+
+                // Clearing the original data after successfully completing all steps
+                Task.Run(() => SourceGamesHelper.ClearSourceGames(Properties.Settings.Default["source_filepath"].ToString()));
             }
             catch (Exception ex)
             {

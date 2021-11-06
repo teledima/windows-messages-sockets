@@ -26,7 +26,7 @@ namespace HelperSockets
 
                 // Complete sending the data to the remote device.  
                 int bytesSent = client.EndSend(asyncResult);
-                _displayMessage.Display(string.Format("Sent {0} bytes to server.\n", bytesSent));
+                _displayMessage.Display(string.Format("Sent {0} bytes to server.\n", _data.Length));
 
                 // Signal that all bytes have been sent.  
                 _eventManual.Set();

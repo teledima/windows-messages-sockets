@@ -25,22 +25,21 @@ namespace HelperSockets
                 // Read data from the remote device.  
                 int bytesRead = client.EndReceive(asyncResult);
 
-                if (bytesRead > 0)
-                {
-                    // There might be more data, so store the data received so far.  
-                    stateObject.sb.Append(Encoding.ASCII.GetString(stateObject.buffer, 0, bytesRead));
+                // Put buffer to response
+                var buffer = Encoding.ASCII.GetString(stateObject.buffer, 0, bytesRead);
 
+                if (_stateObject.typeAccept == TypeAccept.ImportData)
+                    _response += buffer;
+                else
+                    _stateObject.key += buffer;
+                if (client.Available > 0)
+                {
                     // Get the rest of the data.  
                     client.BeginReceive(stateObject.buffer, 0, StateObject.BufferSize, 0,
                         new AsyncCallback(Callback), stateObject);
                 }
                 else
                 {
-                    // All the data has arrived; put it in response.  
-                    if (stateObject.sb.Length > 1)
-                    {
-                        _response = stateObject.sb.ToString();
-                    }
                     // Signal that all bytes have been received.  
                     _eventManual.Set();
                 }
@@ -58,7 +57,10 @@ namespace HelperSockets
             _stateObject.workSocket.BeginReceive(_stateObject.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(Callback), _stateObject);
             bool _actionRes = _eventManual.WaitOne();
             if (_actionRes)
-                _displayMessage.Display(string.Format("Response received : {0}\n", _response));
+                if (_stateObject.typeAccept == TypeAccept.ImportData)
+                    _displayMessage.Display(string.Format("Response received : {0}\n", _response));
+                else if (_stateObject.typeAccept == TypeAccept.SendKey)
+                    _displayMessage.Display("Key received\n");
             return _actionRes;
         }
     }

@@ -22,5 +22,17 @@ namespace WindowsMessagesSockets.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string source_filepath {
+            get {
+                return ((string)(this["source_filepath"]));
+            }
+            set {
+                this["source_filepath"] = value;
+            }
+        }
     }
 }

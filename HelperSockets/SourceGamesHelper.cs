@@ -1,21 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 using System.Linq;
+using System.IO;
+using System;
 
 namespace HelperSockets
 {
     public static class SourceGamesHelper
     {
-        public async static Task<IList<SourceGames>> GetSource(string filepath)
+        public static IEnumerable<SourceGames> GetSource(string filepath)
         {
             using var db = new SourceGamesContext(filepath);
-
-            return await db.SourceGames.ToListAsync();
+            return db.SourceGames.ToList().Where(game => game != null);
         }
 
-        public static byte[] GetBytes(IEnumerable<SourceGames> sourceGames)
+        public static byte[] Encrypt(IEnumerable<SourceGames> sourceGames, string public_key)
         {
             StringBuilder stringBuilder = new();
             foreach (SourceGames game in sourceGames)
@@ -23,23 +24,74 @@ namespace HelperSockets
                 if (game != null)
                     stringBuilder.AppendLine(game.ToString());
             }
-            stringBuilder.Append("<EOF>");
-            return Encoding.ASCII.GetBytes(stringBuilder.ToString()); ;
+
+            var desEncryptor = DES.Create();
+            desEncryptor.GenerateKey();
+            desEncryptor.GenerateIV();
+            var des_transform = desEncryptor.CreateEncryptor(desEncryptor.Key, desEncryptor.IV);
+            
+
+            using var mStream = new MemoryStream();
+            using var cStream = new CryptoStream(mStream, des_transform, CryptoStreamMode.Write);
+
+            var content = Encoding.ASCII.GetBytes(stringBuilder.ToString());
+            cStream.Write(content, 0, content.Length );
+            cStream.FlushFinalBlock();
+
+            using var rsa = new RSACryptoServiceProvider();
+            rsa.FromXmlString(public_key);
+            var desKey = rsa.Encrypt(desEncryptor.Key, false);
+            var desIV = rsa.Encrypt(desEncryptor.IV, false);
+
+            var data = mStream.ToArray()
+                        .Concat(desKey)
+                        .Concat(desIV)
+                        .ToArray();
+
+            return data;
+        }
+
+        public static IEnumerable<SourceGames> Decrypt(byte[] content, byte[] key, byte[] iv)
+        {
+            var result = new List<SourceGames>();
+            var desDecryptor = DES.Create();
+
+            using var mStream = new MemoryStream(content);
+            using var cStream = new CryptoStream(mStream, desDecryptor.CreateDecryptor(key, iv), CryptoStreamMode.Read);
+
+            var decryptedContent = new byte[content.Length];
+            cStream.Read(decryptedContent, 0, decryptedContent.Length);
+
+            foreach (var game in Encoding.ASCII.GetString(decryptedContent).Split('\n'))
+            {
+                var sourceGame = FromString(game.Replace("\r", ""));
+                if (sourceGame != null)
+                    result.Add(sourceGame);
+            }
+            
+            return result;
         }
 
         public static SourceGames FromString(string data)
         {
-            string[] values = data.Split(';');
-            return new SourceGames()
+            try
             {
-                GamesName = string.IsNullOrEmpty(values[0]) ? null : values[0],
-                CategoriesName = string.IsNullOrEmpty(values[1]) ? null : values[1],
-                DownloadableContentsName = string.IsNullOrEmpty(values[2]) ? null : values[2],
-                AchievementsName = string.IsNullOrEmpty(values[3]) ? null : values[3],
-            };
+                string[] values = data.Split(';');
+                return new SourceGames()
+                {
+                    GamesName = string.IsNullOrEmpty(values[0]) ? null : values[0],
+                    CategoriesName = string.IsNullOrEmpty(values[1]) ? null : values[1],
+                    DownloadableContentsName = string.IsNullOrEmpty(values[2]) ? null : values[2],
+                    AchievementsName = string.IsNullOrEmpty(values[3]) ? null : values[3],
+                };
+            }
+            catch(Exception)
+            {
+                return null;
+            }
         }
 
-        public async static void ExportToPostgres(List<SourceGames> sourceGames)
+        public async static void ExportToPostgres(IEnumerable<SourceGames> sourceGames)
         {
             // export order: Category -> Game -> GameCategory -> Achievement -> DownloadableContent
             using var db = new GamesContext();
@@ -121,7 +173,7 @@ namespace HelperSockets
         {
             var db = new SourceGamesContext(filepath);
             db.SourceGames.RemoveRange(db.SourceGames);
-            db.SaveChangesAsync();
+            db.SaveChanges();
         }
     }
 }

@@ -23,13 +23,15 @@ namespace HelperSockets
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SourceGames>().HasNoKey();
+            modelBuilder.Entity<SourceGames>()
+                .HasKey(game => game.Id);
         }
     }
 
 
     public class SourceGames
     {
+        public int Id { get; set; }
         public string GamesName { get; set; }
 
         public string CategoriesName { get; set; }
@@ -43,7 +45,8 @@ namespace HelperSockets
             StringBuilder stringBuilder = new();
             foreach (PropertyInfo property in typeof(SourceGames).GetProperties())
             {
-                stringBuilder.Append(property.GetValue(this)?.ToString() + ";");
+                if (property.Name != "Id")
+                    stringBuilder.Append(property.GetValue(this)?.ToString() + ";");
             }
             stringBuilder.Replace(";", "", stringBuilder.Length - 1, 1);
             return stringBuilder.ToString();

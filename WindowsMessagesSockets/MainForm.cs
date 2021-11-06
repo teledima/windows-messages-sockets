@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using HelperSockets;
-using System.Threading.Tasks;
 
 namespace WindowsMessagesSockets
 {
     public partial class MainForm : Form
     {
         private readonly string initial_directory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
-        private string db_file_path;
         public MainForm()
         {
             InitializeComponent();
@@ -26,7 +23,7 @@ namespace WindowsMessagesSockets
             if (openDbFileDialog.ShowDialog() == DialogResult.OK)
             {
                 textBoxFileName.Text = openDbFileDialog.SafeFileName;
-                db_file_path = openDbFileDialog.FileName;
+                Properties.Settings.Default["source_filepath"] = openDbFileDialog.FileName;
                 buttonSend.Enabled = true;
             }
         }
@@ -35,7 +32,7 @@ namespace WindowsMessagesSockets
         {
             try
             {
-                if (!string.IsNullOrEmpty(db_file_path))
+                if (!string.IsNullOrEmpty(Properties.Settings.Default["source_filepath"].ToString()))
                 {
                     backgroundWorker.RunWorkerAsync();
                     buttonSend.Enabled = false;
@@ -54,7 +51,7 @@ namespace WindowsMessagesSockets
 
             try
             {
-                var sourceGames = SourceGamesHelper.GetSource(db_file_path).Result;
+                var sourceGames = SourceGamesHelper.GetSource(Properties.Settings.Default["source_filepath"].ToString());
                 var client = new Client(displayMessage);
                 client.SendData(sourceGames);
             }
@@ -70,7 +67,6 @@ namespace WindowsMessagesSockets
         private void SendDataFinished(object sender, RunWorkerCompletedEventArgs args)
         {
             buttonSend.Enabled = true;
-            Task.Run(() => SourceGamesHelper.ClearSourceGames(db_file_path));
         }
 
         private void updateHistory(string message)
