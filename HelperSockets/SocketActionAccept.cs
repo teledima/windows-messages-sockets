@@ -2,92 +2,47 @@
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Text;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
+using System.Linq;
 
 namespace HelperSockets
 {
     public class SocketActionAccept : SocketAction
     {
         private RSACryptoServiceProvider _rsa;
-        public SocketActionAccept(StateObject stateObject, IDisplayMessage displayMessage) : base(null, displayMessage)
+        public SocketActionAccept(Socket handler, IDisplayMessage displayMessage) : base(handler, displayMessage)
         {
-            _stateObject = stateObject;
-            _stateObject.typeAccept = TypeAccept.SendKey;
             _rsa = new RSACryptoServiceProvider();
         }
         protected override void Callback(IAsyncResult asyncResult)
         {
             // Signal the main thread to continue.  
             _eventManual.Set();
-            // Get the socket that handles the client request.  
-            var stateObject = (StateObject)asyncResult.AsyncState;
-            Socket listener = stateObject.workSocket;
+            // Get the socket that handles the client request.
+            Socket listener = (Socket)asyncResult.AsyncState;
             Socket handler = listener.EndAccept(asyncResult);
 
-            // Create the state object.  
-            StateObject state = new()
-            {
-                workSocket = handler
-            };
-
-            state.typeAccept = TypeAccept.SendKey;
+            // Send public key to client
             new SocketActionSend(
-                state,
+                handler,
                 _displayMessage, "Send {0} bytes to client.", 
                 Encoding.ASCII.GetBytes(_rsa.ToXmlString(false))
             ).Run();
 
-            state.typeAccept = TypeAccept.ImportData;
-            handler.BeginReceive(
-                state.buffer, 0, StateObject.BufferSize, 0, 
-                new AsyncCallback(ReadCallback), 
-                state);
-        }
-
-        protected override bool RunAction()
-        {
-            // Start an asynchronous socket to listen for connections.  
-            _displayMessage.Display("Waiting for a connection...");
-            // Set the event to nonsignaled state.  
-            _eventManual.Reset();
-            _stateObject.typeAccept = TypeAccept.SendKey;
-            _stateObject.workSocket.BeginAccept(new AsyncCallback(Callback), _stateObject);
-
-            // Wait until a connection is made before continuing.  
-            return _eventManual.WaitOne();
-
-        }
-
-        private void ReadCallback(IAsyncResult ar)
-        {
-            // Retrieve the state object and the handler socket  
-            // from the asynchronous state object.  
-            StateObject state = (StateObject)ar.AsyncState;
-            Socket handler = state.workSocket;
-
-            // Read data from the client socket.
-            int bytesRead = handler.EndReceive(ar);
-
-            // Move buffer to data
-            state.data.AddRange(state.buffer.ToList().GetRange(0, bytesRead));
-            if (handler.Available > 0)
+            var result = new SocketActionReceive(handler, _displayMessage).Run();
+            if (result.Success)
             {
-                // Not all data received. Get more.  
-                handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReadCallback), state);
-            }
-            else if (bytesRead > 0)
-            {
-                // All the data has been read from the client.
+                // Get all data from server.
+                _displayMessage.Display(string.Format("Get {0} from client", result.Response.Length));
+                // Decrypt and export.
 
-                // Split content and key
-                var key = _rsa.Decrypt(state.data.GetRange(state.data.Count - 256, 128).ToArray(), false);
-                var iv = _rsa.Decrypt(state.data.GetRange(state.data.Count - 128, 128).ToArray(), false);
+                var data = result.Response.ToList();
+                // Extract DES key and initialization vector
+                var key = _rsa.Decrypt(data.GetRange(data.Count - 256, 128).ToArray(), false);
+                var iv = _rsa.Decrypt(data.GetRange(data.Count - 128, 128).ToArray(), false);
 
-
-                var sourceGames = SourceGamesHelper.Decrypt(state.data.GetRange(0, state.data.Count - 256).ToArray(), key, iv);
+                // Decrypt main content
+                var sourceGames = SourceGamesHelper.Decrypt(data.GetRange(0, data.Count - 256).ToArray(), key, iv);
 
                 try
                 {
@@ -99,11 +54,24 @@ namespace HelperSockets
                     _displayMessage.Display(e.Message);
                 }
 
-                _displayMessage.Display(string.Format("Read {0} bytes from socket.", state.data.Count));
+                var message = string.Format("Process {0} bytes", data.Count);
 
-
-                new SocketActionSend(state, _displayMessage, "Send {0} bytes to client.", Encoding.ASCII.GetBytes(state.data.Count.ToString())).Run();
+                // Send response to client 
+                new SocketActionSend(handler, _displayMessage, "Send {0} bytes to client.", Encoding.ASCII.GetBytes(message)).Run();
             }
+        }
+
+        protected override ResultAction RunAction()
+        {
+            // Start an asynchronous socket to listen for connections.  
+            _displayMessage.Display("Waiting for a connection...");
+            // Set the event to nonsignaled state.  
+            _eventManual.Reset();
+            _handler.BeginAccept(new AsyncCallback(Callback), _handler);
+
+            // Wait until a connection is made before continuing.  
+            return new ResultAction() { Success = _eventManual.WaitOne() };
+
         }
 
         ~SocketActionAccept()

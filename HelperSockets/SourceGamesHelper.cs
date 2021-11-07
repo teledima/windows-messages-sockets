@@ -16,7 +16,7 @@ namespace HelperSockets
             return db.SourceGames.ToList().Where(game => game != null);
         }
 
-        public static byte[] Encrypt(IEnumerable<SourceGames> sourceGames, string public_key)
+        public static byte[] Encrypt(IEnumerable<SourceGames> sourceGames, byte[] public_key)
         {
             StringBuilder stringBuilder = new();
             foreach (SourceGames game in sourceGames)
@@ -39,7 +39,7 @@ namespace HelperSockets
             cStream.FlushFinalBlock();
 
             using var rsa = new RSACryptoServiceProvider();
-            rsa.FromXmlString(public_key);
+            rsa.FromXmlString(Encoding.ASCII.GetString(public_key));
             var desKey = rsa.Encrypt(desEncryptor.Key, false);
             var desIV = rsa.Encrypt(desEncryptor.IV, false);
 

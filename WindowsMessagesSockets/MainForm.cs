@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -20,10 +19,14 @@ namespace WindowsMessagesSockets
 
         private void buttonSelectFile_Click(object sender, EventArgs e)
         {
+            // if user select file
             if (openDbFileDialog.ShowDialog() == DialogResult.OK)
             {
+                // update text box
                 textBoxFileName.Text = openDbFileDialog.SafeFileName;
+                // save filepath in properties
                 Properties.Settings.Default["source_filepath"] = openDbFileDialog.FileName;
+                // allow user to start export
                 buttonSend.Enabled = true;
             }
         }
@@ -34,7 +37,9 @@ namespace WindowsMessagesSockets
             {
                 if (!string.IsNullOrEmpty(Properties.Settings.Default["source_filepath"].ToString()))
                 {
+                    // Run send data to server
                     backgroundWorker.RunWorkerAsync();
+                    // Block the submit button until the server processes the data 
                     buttonSend.Enabled = false;
                 }
             }
@@ -47,12 +52,16 @@ namespace WindowsMessagesSockets
 
         private void SendData(object sender, DoWorkEventArgs args)
         {
+            // background work started
             IDisplayMessage displayMessage = new DisplayLabel(labelHistory, updateHistory);
 
             try
             {
+                // Try extract data from selected file
                 var sourceGames = SourceGamesHelper.GetSource(Properties.Settings.Default["source_filepath"].ToString());
+                // Initialize client instance
                 var client = new Client(displayMessage);
+                // Send data to server
                 client.SendData(sourceGames);
             }
             catch (Exception ex)
@@ -66,6 +75,7 @@ namespace WindowsMessagesSockets
 
         private void SendDataFinished(object sender, RunWorkerCompletedEventArgs args)
         {
+            // background work finished
             buttonSend.Enabled = true;
         }
 

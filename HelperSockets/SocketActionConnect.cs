@@ -1,44 +1,42 @@
 ﻿using System;
-using HelperSockets;
 using System.Net;
 using System.Net.Sockets;
-using System.Windows.Forms;
 
 namespace HelperSockets
 {
     public class SocketActionConnect : SocketAction
     {
         private readonly IPEndPoint _endPoint;
-        public SocketActionConnect(StateObject stateObject, IDisplayMessage displayMessage, IPEndPoint endPoint): base(stateObject, displayMessage) 
+        public SocketActionConnect(Socket handler, IDisplayMessage displayMessage, IPEndPoint endPoint): base(handler, displayMessage) 
         {
             _endPoint = endPoint;
+            _handler = handler;
         }
         protected override void Callback(IAsyncResult asyncResult)
         {
-            StateObject stateObject = (StateObject)asyncResult.AsyncState;
             try
             {
                 // Retrieve the socket from the state object.  
-                Socket client = stateObject.workSocket;
+                Socket handler = (Socket)asyncResult.AsyncState;
 
                 // Complete the connection.  
-                client.EndConnect(asyncResult);
-                _displayMessage.Display(string.Format("Socket connected to {0}\n", client.RemoteEndPoint.ToString()));
+                handler.EndConnect(asyncResult);
+                _displayMessage.Display(string.Format("Socket connected to {0}\n", handler.RemoteEndPoint.ToString()));
 
                 // Signal that the connection has been made.  
                 _eventManual.Set();
             }
             catch (Exception ex)
             {
-                stateObject.errorMessage = ex.Message + "\n";
+                _errorMessage = ex.Message + "\n";
                 _eventManual.Set();
             }
         }
 
-        protected override bool RunAction()
+        protected override ResultAction RunAction()
         {
-            _stateObject.workSocket.BeginConnect(_endPoint, new AsyncCallback(Callback), _stateObject);
-            return _eventManual.WaitOne(_timeout);
+            _handler.BeginConnect(_endPoint, new AsyncCallback(Callback), _handler);
+            return new ResultAction() { Success = _eventManual.WaitOne(_timeout) };
         }
     }
 }

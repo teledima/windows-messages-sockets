@@ -20,7 +20,7 @@ namespace SocketServer
         public void StartListening()
         {
             // Create a TCP/IP socket.  
-            Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Socket listener = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint and listen for incoming connections.  
             try
@@ -30,7 +30,7 @@ namespace SocketServer
 
                 while (true)
                 {
-                    new SocketActionAccept(new StateObject { workSocket = listener }, _displayMessage).Run();
+                    new SocketActionAccept(listener, _displayMessage).Run();
                 }
 
             }

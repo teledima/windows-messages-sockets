@@ -1,32 +1,37 @@
 ﻿using System;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace HelperSockets
 {
     public abstract class SocketAction
     {
-        protected StateObject _stateObject;
+        protected Socket _handler;
         protected IDisplayMessage _displayMessage;
-        protected ManualResetEvent _eventManual = new ManualResetEvent(false);
+        protected string _errorMessage = string.Empty;
+
+        protected ManualResetEvent _eventManual = new(false);
         protected int _timeout = (int)Properties.Settings.Default["timeout"];
-        public SocketAction(StateObject stateObject, IDisplayMessage displayMessage)
+        
+        public SocketAction(Socket handler, IDisplayMessage displayMessage)
         {
-            _stateObject = stateObject;
+            _handler = handler;
             _displayMessage = displayMessage;
         }
 
-        public bool Run()
+        /// <summary>
+        ///  Etrypoint for socket action
+        /// </summary>
+        /// <returns></returns>
+        public ResultAction Run()
         {
-            bool res = RunAction();
-            if (!res || !string.IsNullOrEmpty(_stateObject.errorMessage))
-            {
-                _displayMessage.Display(_stateObject.errorMessage);
-                return false;
-            }
-            return true;
+            var res = RunAction();
+            if (!string.IsNullOrEmpty(_errorMessage))
+                _displayMessage.Display(_errorMessage);
+            return res;
         }
 
-        protected abstract bool RunAction();
+        protected abstract ResultAction RunAction();
         protected abstract void Callback(IAsyncResult asyncResult);
     }
 }

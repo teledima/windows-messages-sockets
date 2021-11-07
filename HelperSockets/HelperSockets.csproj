@@ -190,6 +190,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ResultAction.cs" />
     <Compile Include="SocketAction.cs" />
     <Compile Include="SocketActionAccept.cs" />
     <Compile Include="SocketActionConnect.cs" />
@@ -197,7 +198,6 @@
     <Compile Include="SocketActionSend.cs" />
     <Compile Include="SourceGamesContext.cs" />
     <Compile Include="SourceGamesHelper.cs" />
-    <Compile Include="StateObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

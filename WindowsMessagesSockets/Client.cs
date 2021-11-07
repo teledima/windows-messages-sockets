@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace WindowsMessagesSockets
@@ -32,32 +33,30 @@ namespace WindowsMessagesSockets
                 // Create a TCP/IP socket. 
                 using Socket client = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-                bool _actionResult = false;
-                StateObject _stateObject = new()
-                {
-                    workSocket = client,
-                };
+                ResultAction _actionResult;
                 // Connect to the remote endpoint.  
-                _actionResult = new SocketActionConnect(_stateObject, _displayMessage, _endPoint).Run();
-                if (!_actionResult)
+                _actionResult = new SocketActionConnect(client, _displayMessage, _endPoint).Run();
+                if (!_actionResult.Success)
                     return;
 
                 // Receive rsa public key 
-                _stateObject.typeAccept = TypeAccept.SendKey;
-                _actionResult = new SocketActionReceive(_stateObject, _displayMessage).Run();
-                if (!_actionResult)
+                _actionResult = new SocketActionReceive(client, _displayMessage).Run();
+                if (!_actionResult.Success)
                     return;
+                else
+                    _displayMessage.Display("Key received\n");
 
                 // Send test data to the remote device.  
-                _actionResult = new SocketActionSend(_stateObject, _displayMessage, "Send {0} bytes to server.\n", SourceGamesHelper.Encrypt(sourceGames, _stateObject.key)).Run();
-                if (!_actionResult)
+                _actionResult = new SocketActionSend(client, _displayMessage, "Send {0} bytes to server.\n", SourceGamesHelper.Encrypt(sourceGames, _actionResult.Response)).Run();
+                if (!_actionResult.Success)
                     return;
 
-                // Receive the response from the remote device.  
-                _stateObject.typeAccept = TypeAccept.ImportData;
-                _actionResult = new SocketActionReceive(_stateObject, _displayMessage).Run();
-                if (!_actionResult)
+                // Receive the response from the remote device.
+                _actionResult = new SocketActionReceive(client, _displayMessage).Run();
+                if (!_actionResult.Success)
                     return;
+                else
+                    _displayMessage.Display(string.Format("Response received : {0}\n", Encoding.ASCII.GetString(_actionResult.Response)));
 
                 // Clearing the original data after successfully completing all steps
                 Task.Run(() => SourceGamesHelper.ClearSourceGames(Properties.Settings.Default["source_filepath"].ToString()));

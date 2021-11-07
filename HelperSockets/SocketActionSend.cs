@@ -1,30 +1,22 @@
-﻿using HelperSockets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
 namespace HelperSockets
 {
     public class SocketActionSend : SocketAction
     {
         private readonly byte[] _data;
         private readonly string _displayPattern;
-        public SocketActionSend(StateObject stateObject, IDisplayMessage displayMessage, string displayPattern, byte[] data): base(stateObject, displayMessage)
+        public SocketActionSend(Socket handler, IDisplayMessage displayMessage, string displayPattern, byte[] data): base(handler, displayMessage)
         {
             _data = data;
             _displayPattern = displayPattern;
         }
         protected override void Callback(IAsyncResult asyncResult)
         {
-            StateObject stateObject = (StateObject)asyncResult.AsyncState;
             try
             {
                 // Retrieve the socket from the state object.  
-                Socket client = stateObject.workSocket;
+                Socket client = (Socket)asyncResult.AsyncState;
 
                 // Complete sending the data to the remote device.  
                 int bytesSent = client.EndSend(asyncResult);
@@ -35,17 +27,17 @@ namespace HelperSockets
             }
             catch (Exception ex)
             {
-                stateObject.errorMessage = ex.Message + "\n";
+                _errorMessage = ex.Message + "\n";
                 _eventManual.Set();
             }
         }
 
-        protected override bool RunAction()
+        protected override ResultAction RunAction()
         {
             // Begin sending the data to the remote device.  
-            _stateObject.workSocket.BeginSend(_data, 0, _data.Length, 0, new AsyncCallback(Callback), _stateObject);
+            _handler.BeginSend(_data, 0, _data.Length, 0, new AsyncCallback(Callback), _handler);
 
-            return _eventManual.WaitOne(_timeout);
+            return new ResultAction() { Success = _eventManual.WaitOne(_timeout) };
         }
     }
 }

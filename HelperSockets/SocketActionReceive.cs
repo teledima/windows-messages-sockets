@@ -1,42 +1,44 @@
-﻿using HelperSockets;
-using System;
+﻿using System;
 using System.Net.Sockets;
-using System.Text;
-using System.Windows.Forms;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace HelperSockets
 {
     public class SocketActionReceive : SocketAction
     {
-        private string _response;
-        public SocketActionReceive(StateObject stateObject, IDisplayMessage displayMessage) : base(stateObject, displayMessage)
+        private List<byte> _response;
+        private byte[] _buffer;
+        private int _bufferSize;
+        public int BufferSize
         {
-
+            get { return _bufferSize; }
+            set { if (value > 0) _bufferSize = value; }
+        }
+        public SocketActionReceive(Socket handler, IDisplayMessage displayMessage) : base(handler, displayMessage)
+        {
+            BufferSize = 256;
+            _buffer = new byte[BufferSize];
+            _response = new List<byte>();
         }
         protected override void Callback(IAsyncResult asyncResult)
         {
-            // Retrieve the state object and the client socket
-            // from the asynchronous state object.  
-            StateObject stateObject = (StateObject)asyncResult.AsyncState;
             try
             {
-                Socket client = stateObject.workSocket;
+                // Retrieve the state object and the client socket
+                // from the asynchronous state object.  
+                Socket handler = (Socket)asyncResult.AsyncState;
 
                 // Read data from the remote device.  
-                int bytesRead = client.EndReceive(asyncResult);
+                int bytesRead = handler.EndReceive(asyncResult);
 
-                // Put buffer to response
-                var buffer = Encoding.ASCII.GetString(stateObject.buffer, 0, bytesRead);
-
-                if (_stateObject.typeAccept == TypeAccept.ImportData)
-                    _response += buffer;
-                else
-                    _stateObject.key += buffer;
-                if (client.Available > 0)
+                // Move buffer to response.
+                _response.AddRange(_buffer.ToList().GetRange(0, bytesRead));
+                if (handler.Available > 0)
                 {
                     // Get the rest of the data.  
-                    client.BeginReceive(stateObject.buffer, 0, StateObject.BufferSize, 0,
-                        new AsyncCallback(Callback), stateObject);
+                    handler.BeginReceive(_buffer, 0, BufferSize, 0,
+                        new AsyncCallback(Callback), handler);
                 }
                 else
                 {
@@ -46,22 +48,16 @@ namespace HelperSockets
             }
             catch (Exception ex)
             {
-                stateObject.errorMessage = ex.Message + "\n";
+                _errorMessage = ex.Message + "\n";
                 _eventManual.Set();
             }
         }
 
-        protected override bool RunAction()
+        protected override ResultAction RunAction()
         {
             // Begin receiving the data from the remote device.  
-            _stateObject.workSocket.BeginReceive(_stateObject.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(Callback), _stateObject);
-            bool _actionRes = _eventManual.WaitOne();
-            if (_actionRes)
-                if (_stateObject.typeAccept == TypeAccept.ImportData)
-                    _displayMessage.Display(string.Format("Response received : {0}\n", _response));
-                else if (_stateObject.typeAccept == TypeAccept.SendKey)
-                    _displayMessage.Display("Key received\n");
-            return _actionRes;
+            _handler.BeginReceive(_buffer, 0, BufferSize, 0, new AsyncCallback(Callback), _handler);
+            return new ResultAction() { Success = _eventManual.WaitOne(), Response = _response.ToArray() };
         }
     }
 }
