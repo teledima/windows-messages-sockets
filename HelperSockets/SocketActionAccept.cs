@@ -70,7 +70,7 @@ namespace HelperSockets
             _handler.BeginAccept(new AsyncCallback(Callback), _handler);
 
             // Wait until a connection is made before continuing.  
-            return new ResultAction() { Success = _eventManual.WaitOne() };
+            return new ResultAction() { Success = _eventManual.WaitOne(_timeout) };
 
         }
 

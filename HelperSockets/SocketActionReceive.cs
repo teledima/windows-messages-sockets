@@ -57,7 +57,7 @@ namespace HelperSockets
         {
             // Begin receiving the data from the remote device.  
             _handler.BeginReceive(_buffer, 0, BufferSize, 0, new AsyncCallback(Callback), _handler);
-            return new ResultAction() { Success = _eventManual.WaitOne(), Response = _response.ToArray() };
+            return new ResultAction() { Success = _eventManual.WaitOne(_timeout), Response = _response.ToArray() };
         }
     }
 }
