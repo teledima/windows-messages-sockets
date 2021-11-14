@@ -25,7 +25,15 @@ namespace HelperSockets
         /// <returns></returns>
         public ResultAction Run()
         {
-            var res = RunAction();
+            var res = new ResultAction();
+            try
+            {
+                res = RunAction();
+            }
+            catch
+            {
+                res.Success = false;
+            }
             if (!string.IsNullOrEmpty(_errorMessage))
                 _displayMessage.Display(_errorMessage);
             return res;

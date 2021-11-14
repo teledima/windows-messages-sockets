@@ -16,7 +16,7 @@ namespace HelperSockets
             return db.SourceGames.ToList().Where(game => game != null);
         }
 
-        public static byte[] Encrypt(IEnumerable<SourceGames> sourceGames, byte[] public_key)
+        public static byte[] Encrypt(IEnumerable<SourceGames> sourceGames, DesService desService)
         {
             StringBuilder stringBuilder = new();
             foreach (SourceGames game in sourceGames)
@@ -25,44 +25,13 @@ namespace HelperSockets
                     stringBuilder.AppendLine(game.ToString());
             }
 
-            var desEncryptor = DES.Create();
-            desEncryptor.GenerateKey();
-            desEncryptor.GenerateIV();
-            var des_transform = desEncryptor.CreateEncryptor(desEncryptor.Key, desEncryptor.IV);
-            
-
-            using var mStream = new MemoryStream();
-            using var cStream = new CryptoStream(mStream, des_transform, CryptoStreamMode.Write);
-
-            var content = Encoding.ASCII.GetBytes(stringBuilder.ToString());
-            cStream.Write(content, 0, content.Length );
-            cStream.FlushFinalBlock();
-
-            using var rsa = new RSACryptoServiceProvider();
-            rsa.FromXmlString(Encoding.ASCII.GetString(public_key));
-            var desKey = rsa.Encrypt(desEncryptor.Key, false);
-            var desIV = rsa.Encrypt(desEncryptor.IV, false);
-
-            var data = mStream.ToArray()
-                        .Concat(desKey)
-                        .Concat(desIV)
-                        .ToArray();
-
-            return data;
+            return desService.Encrypt(Encoding.ASCII.GetBytes(stringBuilder.ToString()));
         }
 
-        public static IEnumerable<SourceGames> Decrypt(byte[] content, byte[] key, byte[] iv)
+        public static IEnumerable<SourceGames> Decrypt(byte[] content)
         {
             var result = new List<SourceGames>();
-            var desDecryptor = DES.Create();
-
-            using var mStream = new MemoryStream(content);
-            using var cStream = new CryptoStream(mStream, desDecryptor.CreateDecryptor(key, iv), CryptoStreamMode.Read);
-
-            var decryptedContent = new byte[content.Length];
-            cStream.Read(decryptedContent, 0, decryptedContent.Length);
-
-            foreach (var game in Encoding.ASCII.GetString(decryptedContent).Split('\n'))
+            foreach (var game in Encoding.ASCII.GetString(content).Split('\n'))
             {
                 var sourceGame = FromString(game.Replace("\r", ""));
                 if (sourceGame != null)

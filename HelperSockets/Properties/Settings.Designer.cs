@@ -58,5 +58,14 @@ namespace HelperSockets.Properties {
                 return ((int)(this["timeout"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("128")]
+        public int des_keysize {
+            get {
+                return ((int)(this["des_keysize"]));
+            }
+        }
     }
 }

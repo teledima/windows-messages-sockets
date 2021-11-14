@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Text;
 using System.Security.Cryptography;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace HelperSockets
 {
@@ -29,35 +30,56 @@ namespace HelperSockets
                 Encoding.ASCII.GetBytes(_rsa.ToXmlString(false))
             ).Run();
 
-            var result = new SocketActionReceive(handler, _displayMessage).Run();
+            var desService = new DesService();
+            var result = new SocketActionReceive(handler, _displayMessage, (int)Properties.Settings.Default["des_keysize"]).Run();
             if (result.Success)
             {
-                // Get all data from server.
-                _displayMessage.Display(string.Format("Get {0} from client", result.Response.Length));
-                // Decrypt and export.
+                _displayMessage.Display(string.Format("Get key from client", result.Response.Length));
+                desService.Key = _rsa.Decrypt(result.Response, false);
+            }
 
-                var data = result.Response.ToList();
-                // Extract DES key and initialization vector
-                var key = _rsa.Decrypt(data.GetRange(data.Count - 256, 128).ToArray(), false);
-                var iv = _rsa.Decrypt(data.GetRange(data.Count - 128, 128).ToArray(), false);
+            result = new SocketActionReceive(handler, _displayMessage, (int)Properties.Settings.Default["des_keysize"]).Run();
+            if (result.Success)
+            {
+                _displayMessage.Display(string.Format("Get initialization vector from client", result.Response.Length));
+                desService.IV = _rsa.Decrypt(result.Response, false);
+            }
 
-                // Decrypt main content
-                var sourceGames = SourceGamesHelper.Decrypt(data.GetRange(0, data.Count - 256).ToArray(), key, iv);
-
-                try
+            var sourceGames = new List<SourceGames>();
+            while (true)
+            {
+                result = new SocketActionReceive(handler, _displayMessage).Run();
+                if (result.Success)
                 {
-                    // Export data
-                    Task.Run(() => SourceGamesHelper.ExportToPostgres(sourceGames));
-                }
-                catch (Exception e)
-                {
-                    _displayMessage.Display(e.Message);
-                }
+                    // Get all data from server.
+                    _displayMessage.Display(string.Format("Get {0} bytes from client", result.Response.Length));
 
-                var message = string.Format("Process {0} bytes", data.Count);
+                    // Decrypt response
+                    var data = desService.Decrypt(result.Response).ToList().Where(symbol => symbol != 0).ToArray();
 
-                // Send response to client 
-                new SocketActionSend(handler, _displayMessage, "Send {0} bytes to client.", Encoding.ASCII.GetBytes(message)).Run();
+                    // check if the answer is a keyword, then exit the loop
+                    if (Encoding.ASCII.GetString(data) == "<EOF>")
+                        break;
+
+                    sourceGames.AddRange(SourceGamesHelper.Decrypt(data).ToList());
+
+                    _displayMessage.Display(string.Format("Process {0} bytes", data.Length));
+                }
+                else
+                    break;
+            };
+
+            // Send response to client 
+            new SocketActionSend(handler, _displayMessage, "All data gets.", Encoding.ASCII.GetBytes("Ok")).Run();
+
+            try
+            {
+                // Export data
+                Task.Run(() => SourceGamesHelper.ExportToPostgres(sourceGames));
+            }
+            catch (Exception e)
+            {
+                _displayMessage.Display(e.Message);
             }
         }
 
@@ -70,7 +92,7 @@ namespace HelperSockets
             _handler.BeginAccept(new AsyncCallback(Callback), _handler);
 
             // Wait until a connection is made before continuing.  
-            return new ResultAction() { Success = _eventManual.WaitOne(_timeout) };
+            return new ResultAction() { Success = _eventManual.WaitOne() };
 
         }
 
