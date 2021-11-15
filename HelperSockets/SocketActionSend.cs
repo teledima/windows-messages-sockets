@@ -37,7 +37,7 @@ namespace HelperSockets
             // Begin sending the data to the remote device.  
             _handler.BeginSend(_data, 0, _data.Length, 0, new AsyncCallback(Callback), _handler);
 
-            return new ResultAction() { Success = _eventManual.WaitOne(_timeout) };
+            return new ResultAction() { Success = _eventManual.WaitOne(/*_timeout*/) };
         }
     }
 }

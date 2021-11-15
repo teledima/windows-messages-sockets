@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 
 namespace HelperSockets
@@ -6,28 +8,21 @@ namespace HelperSockets
 
     public class DesService
     {
-        private readonly DES desService;
+        public byte[] Key { get; set; }
 
-        public byte[] Key { 
-            get { return desService.Key; } 
-            set { desService.Key = value; } 
-        }
-
-        public byte[] IV
-        {
-            get { return desService.IV; }
-            set { desService.IV = value; }
-        }
+        public byte[] IV { get; set; }
 
         public DesService()
         {
-            desService = DES.Create();
+            var desService = DES.Create();
             desService.GenerateKey();
             desService.GenerateIV();
+
+            Key = desService.Key;
+            IV = desService.IV;
         }
         public DesService(byte[] key, byte[] iv)
         {
-            desService = DES.Create();
             Key = key;
             IV = iv;
         }
@@ -36,7 +31,7 @@ namespace HelperSockets
         {
             if (data.Length == 0)
                 return new byte[0];
-            using var encryptor = desService.CreateEncryptor(Key, IV);
+            using var encryptor = DES.Create().CreateEncryptor(Key, IV);
             using var mStream = new MemoryStream();
             using var cStream = new CryptoStream(mStream, encryptor, CryptoStreamMode.Write);
             cStream.Write(data, 0, data.Length);
@@ -47,13 +42,28 @@ namespace HelperSockets
 
         public byte[] Decrypt(byte[] data)
         {
-            using var decryptor = desService.CreateDecryptor(Key, IV);
+            using var decryptor = DES.Create().CreateDecryptor(Key, IV);
             using var mStream = new MemoryStream(data);
             using var cStream = new CryptoStream(mStream, decryptor, CryptoStreamMode.Read);
 
             var decoded_content = new byte[data.Length];
             cStream.Read(decoded_content, 0, decoded_content.Length);
             return decoded_content;
+        }
+
+        public byte[] Serialize()
+        {
+            var binaryFormatter = new BinaryFormatter();
+            using var mStream = new MemoryStream();
+            binaryFormatter.Serialize(mStream, this);
+            return mStream.ToArray();
+        }
+
+        public static DesService FromBytes(byte[] data)
+        {
+            var binaryFormatter = new BinaryFormatter();
+            using var mStream = new MemoryStream(data);
+            return (DesService)binaryFormatter.Deserialize(mStream);
         }
     }
 }

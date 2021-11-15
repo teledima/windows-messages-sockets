@@ -15,17 +15,10 @@ namespace HelperSockets
             get { return _bufferSize; }
             set { if (value > 0) _bufferSize = value; }
         }
-
-        private readonly int? _messageSize;
-        public SocketActionReceive(Socket handler, IDisplayMessage displayMessage, int? messageSize = null) : base(handler, displayMessage)
+        public SocketActionReceive(Socket handler, IDisplayMessage displayMessage) : base(handler, displayMessage)
         {
             // Set default buffer size
             BufferSize = 256;
-            _messageSize = messageSize;
-
-            // if the message size is less than the buffer size, then it will decrease the buffer so as not to receive unnecessary data
-            if (messageSize < BufferSize)
-                BufferSize = (int)messageSize;
             _buffer = new byte[BufferSize];
             _response = new List<byte>();
         }
@@ -42,7 +35,7 @@ namespace HelperSockets
 
                 // Move buffer to response.
                 _response.AddRange(_buffer.ToList().GetRange(0, bytesRead));
-                if (handler.Available > 0 && _messageSize != null && _response.Count < _messageSize)
+                if (handler.Available > 0)
                 {
                     if (handler.Available < BufferSize)
                         BufferSize = handler.Available;
@@ -67,7 +60,7 @@ namespace HelperSockets
         {
             // Begin receiving the data from the remote device.  
             _handler.BeginReceive(_buffer, 0, BufferSize, 0, new AsyncCallback(Callback), _handler);
-            return new ResultAction() { Success = _eventManual.WaitOne(_timeout), Response = _response.ToArray() };
+            return new ResultAction() { Success = _eventManual.WaitOne(/*_timeout*/), Response = _response.ToArray() };
         }
     }
 }

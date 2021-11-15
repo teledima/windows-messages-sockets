@@ -56,11 +56,7 @@ namespace WindowsMessagesSockets
                     _displayMessage.Display("AES Key received\n");
                 }
                 // Send des key
-                _actionResult = new SocketActionSend(client, _displayMessage, "Send DES key to server.\n", rsaService.Encrypt(_desService.Key, false)).Run();
-                if (!_actionResult.Success)
-                    return;
-
-                _actionResult = new SocketActionSend(client, _displayMessage, "Send DES initialize vector to sever.\n", rsaService.Encrypt(_desService.IV, false)).Run();
+                _actionResult = new SocketActionSend(client, _displayMessage, "Send DES key to server.\n", rsaService.Encrypt(_desService.Serialize(), false)).Run();
                 if (!_actionResult.Success)
                     return;
 

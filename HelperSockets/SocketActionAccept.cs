@@ -13,7 +13,7 @@ namespace HelperSockets
         private RSACryptoServiceProvider _rsa;
         public SocketActionAccept(Socket handler, IDisplayMessage displayMessage) : base(handler, displayMessage)
         {
-            _rsa = new RSACryptoServiceProvider();
+            _rsa = new RSACryptoServiceProvider(2048);
         }
         protected override void Callback(IAsyncResult asyncResult)
         {
@@ -31,18 +31,11 @@ namespace HelperSockets
             ).Run();
 
             var desService = new DesService();
-            var result = new SocketActionReceive(handler, _displayMessage, (int)Properties.Settings.Default["des_keysize"]).Run();
+            var result = new SocketActionReceive(handler, _displayMessage).Run();
             if (result.Success)
             {
                 _displayMessage.Display(string.Format("Get key from client", result.Response.Length));
-                desService.Key = _rsa.Decrypt(result.Response, false);
-            }
-
-            result = new SocketActionReceive(handler, _displayMessage, (int)Properties.Settings.Default["des_keysize"]).Run();
-            if (result.Success)
-            {
-                _displayMessage.Display(string.Format("Get initialization vector from client", result.Response.Length));
-                desService.IV = _rsa.Decrypt(result.Response, false);
+                desService = DesService.FromBytes(_rsa.Decrypt(result.Response, false));
             }
 
             var sourceGames = new List<SourceGames>();
