@@ -60,9 +60,17 @@ namespace WindowsMessagesSockets
                 // Try extract data from selected file
                 var sourceGames = SourceGamesHelper.GetSource(Properties.Settings.Default["source_filepath"].ToString());
                 // Initialize client instance
-                var client = new Client(displayMessage);
-                // Send data to server
-                client.SendData(sourceGames);
+                if (radioButtonSockets.Checked)
+                {
+                    var client = new Client(displayMessage);
+                    // Send data to server
+                    client.SendData(sourceGames);
+                }
+                else if (radioButtonMessages.Checked)
+                {
+                    var client = new ClientMessages(displayMessage);
+                    client.SendData(sourceGames);
+                }
             }
             catch (Exception ex)
             {

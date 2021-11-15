@@ -28,7 +28,7 @@ namespace HelperSockets
             return desService.Encrypt(Encoding.ASCII.GetBytes(stringBuilder.ToString()));
         }
 
-        public static IEnumerable<SourceGames> Decrypt(byte[] content)
+        public static IEnumerable<SourceGames> Parse(byte[] content)
         {
             var result = new List<SourceGames>();
             foreach (var game in Encoding.ASCII.GetString(content).Split('\n'))

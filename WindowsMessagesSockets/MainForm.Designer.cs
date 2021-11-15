@@ -38,6 +38,7 @@ namespace WindowsMessagesSockets
             this.radioButtonSockets = new System.Windows.Forms.RadioButton();
             this.buttonSend = new System.Windows.Forms.Button();
             this.labelHistory = new System.Windows.Forms.Label();
+            this.radioButtonMessages = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // backgroundWorker
@@ -91,7 +92,7 @@ namespace WindowsMessagesSockets
             // 
             // buttonSend
             // 
-            this.buttonSend.Location = new System.Drawing.Point(13, 98);
+            this.buttonSend.Location = new System.Drawing.Point(9, 120);
             this.buttonSend.Name = "buttonSend";
             this.buttonSend.Size = new System.Drawing.Size(425, 23);
             this.buttonSend.TabIndex = 4;
@@ -104,16 +105,28 @@ namespace WindowsMessagesSockets
             // 
             this.labelHistory.AutoEllipsis = true;
             this.labelHistory.AutoSize = true;
-            this.labelHistory.Location = new System.Drawing.Point(13, 128);
+            this.labelHistory.Location = new System.Drawing.Point(13, 162);
             this.labelHistory.Name = "labelHistory";
             this.labelHistory.Size = new System.Drawing.Size(0, 13);
             this.labelHistory.TabIndex = 5;
+            // 
+            // radioButtonMessages
+            // 
+            this.radioButtonMessages.AutoSize = true;
+            this.radioButtonMessages.Location = new System.Drawing.Point(16, 97);
+            this.radioButtonMessages.Name = "radioButtonMessages";
+            this.radioButtonMessages.Size = new System.Drawing.Size(103, 17);
+            this.radioButtonMessages.TabIndex = 6;
+            this.radioButtonMessages.TabStop = true;
+            this.radioButtonMessages.Text = "Message Queue";
+            this.radioButtonMessages.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(450, 264);
+            this.ClientSize = new System.Drawing.Size(450, 406);
+            this.Controls.Add(this.radioButtonMessages);
             this.Controls.Add(this.labelHistory);
             this.Controls.Add(this.buttonSend);
             this.Controls.Add(this.radioButtonSockets);
@@ -138,6 +151,7 @@ namespace WindowsMessagesSockets
         private System.Windows.Forms.Label labelHistory;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
         private HelperSockets.updateLabelDelegate updateLabel;
+        private System.Windows.Forms.RadioButton radioButtonMessages;
     }
 }
 

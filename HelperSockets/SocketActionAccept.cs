@@ -54,7 +54,7 @@ namespace HelperSockets
                     if (Encoding.ASCII.GetString(data) == "<EOF>")
                         break;
 
-                    sourceGames.AddRange(SourceGamesHelper.Decrypt(data).ToList());
+                    sourceGames.AddRange(SourceGamesHelper.Parse(data).ToList());
 
                     _displayMessage.Display(string.Format("Process {0} bytes", data.Length));
                 }

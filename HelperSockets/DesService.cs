@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 namespace HelperSockets
 {
-
+    [Serializable]
     public class DesService
     {
         public byte[] Key { get; set; }

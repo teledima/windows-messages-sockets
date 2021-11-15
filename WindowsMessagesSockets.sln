@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketServer", "SocketServe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperSockets", "HelperSockets\HelperSockets.csproj", "{74F58EDF-AFA2-4127-9181-35865EE90494}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQServer", "MQServer\MQServer.csproj", "{3060C22F-B523-473F-BDA0-60372E65CFA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{74F58EDF-AFA2-4127-9181-35865EE90494}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74F58EDF-AFA2-4127-9181-35865EE90494}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74F58EDF-AFA2-4127-9181-35865EE90494}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3060C22F-B523-473F-BDA0-60372E65CFA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3060C22F-B523-473F-BDA0-60372E65CFA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3060C22F-B523-473F-BDA0-60372E65CFA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3060C22F-B523-473F-BDA0-60372E65CFA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
