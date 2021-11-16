@@ -81,7 +81,7 @@ namespace WindowsMessagesSockets
             // radioButtonSockets
             // 
             this.radioButtonSockets.AutoSize = true;
-            this.radioButtonSockets.Checked = true;
+            this.radioButtonSockets.Checked = false;
             this.radioButtonSockets.Location = new System.Drawing.Point(16, 74);
             this.radioButtonSockets.Name = "radioButtonSockets";
             this.radioButtonSockets.Size = new System.Drawing.Size(64, 17);
@@ -109,11 +109,13 @@ namespace WindowsMessagesSockets
             this.labelHistory.Name = "labelHistory";
             this.labelHistory.Size = new System.Drawing.Size(0, 13);
             this.labelHistory.TabIndex = 5;
+            this.labelHistory.MouseClick += new System.Windows.Forms.MouseEventHandler(this.labelHistory_MouseClick);
             // 
             // radioButtonMessages
             // 
             this.radioButtonMessages.AutoSize = true;
             this.radioButtonMessages.Location = new System.Drawing.Point(16, 97);
+            this.radioButtonMessages.Checked = true;
             this.radioButtonMessages.Name = "radioButtonMessages";
             this.radioButtonMessages.Size = new System.Drawing.Size(103, 17);
             this.radioButtonMessages.TabIndex = 6;

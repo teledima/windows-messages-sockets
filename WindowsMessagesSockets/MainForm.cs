@@ -66,7 +66,7 @@ namespace WindowsMessagesSockets
                     // Send data to server
                     client.SendData(sourceGames);
                 }
-                else if (radioButtonMessages.Checked)
+                else
                 {
                     var client = new ClientMessages(displayMessage);
                     client.SendData(sourceGames);
@@ -90,6 +90,14 @@ namespace WindowsMessagesSockets
         private void updateHistory(string message)
         {
             labelHistory.Text += message;
+        }
+
+        private void labelHistory_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                labelHistory.Text = string.Empty;
+            }
         }
     }
 }

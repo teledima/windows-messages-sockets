@@ -138,10 +138,13 @@ namespace HelperSockets
             }
         }
 
-        public static void ClearSourceGames(string filepath)
+        public static void ClearSourceGames(string filepath, IEnumerable<SourceGames> sourceGames = null)
         {
             var db = new SourceGamesContext(filepath);
-            db.SourceGames.RemoveRange(db.SourceGames);
+            if (sourceGames == null)
+                db.SourceGames.RemoveRange(db.SourceGames);
+            else
+                db.SourceGames.RemoveRange(sourceGames);
             db.SaveChanges();
         }
     }

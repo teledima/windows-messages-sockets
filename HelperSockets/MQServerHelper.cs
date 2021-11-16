@@ -9,8 +9,6 @@ namespace HelperSockets
         public static void SendData(IModel channel, string nameQueue, byte[] data)
         {
             channel.BasicPublish("", nameQueue, null, data);
-
-            Console.WriteLine("Сообщение доставлено в очередь " + nameQueue);
         }
 
         public static byte[] RecieveData(IModel channel, string nameQueue)
@@ -25,11 +23,8 @@ namespace HelperSockets
             };
 
             string tag = channel.BasicConsume(nameQueue, true, consumer);
-
-            while (data == null)
-            { }
+            while (data == null) ;
             channel.BasicCancelNoWait(tag);
-            Console.WriteLine("Сообщение принято из очереди " + nameQueue);
             return data;
         }
     }

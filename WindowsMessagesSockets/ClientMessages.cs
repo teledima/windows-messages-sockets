@@ -33,20 +33,24 @@ namespace WindowsMessagesSockets
                     // Get AES key
                     RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
                     RSA.FromXmlString(Encoding.UTF8.GetString(MQServerHelper.RecieveData(channel, "RSA")));
+                    _displayMessage.Display("Получен RSA ключ из сервера\n");
 
                     // Send DES key
                     var desServive = new DesService();
                     byte[] DESEncrypt = RSA.Encrypt(desServive.Serialize(), false);
                     MQServerHelper.SendData(channel, "DES", DESEncrypt);
+                    _displayMessage.Display("Отправлен DES ключ серверу\n");
 
                     // Send rows
                     foreach (var sourceGame in sourceGames)
                     {
                         var encryptedData = SourceGamesHelper.Encrypt(new List<SourceGames>() { sourceGame }, desServive);
                         MQServerHelper.SendData(channel, "SourceGames", encryptedData);
+                        _displayMessage.Display(string.Format("Запись отправлена, размер: {0} байт\n", encryptedData.Length));
+                        // SourceGamesHelper.ClearSourceGames(Properties.Settings.Default["source_filepath"].ToString(), new List<SourceGames>() { sourceGame });
                     }
                 }
-                _displayMessage.Display("Отправлено.\n");
+                _displayMessage.Display("Все данные отправлены.\n");
             }
             catch (Exception ex)
             {
