@@ -63,9 +63,10 @@ namespace WindowsMessagesSockets
                 // Get list rows from source table
                 foreach (var sourceGame in sourceGames)
                 {
-                    Thread.Sleep(100);
-                    // Send encrypted row to server.  
-                    _actionResult = new SocketActionSend(client, _displayMessage, "Send {0} bytes to server.\n", SourceGamesHelper.Encrypt(new[] { sourceGame }, _desService)).Run();
+                    // Encrypt row
+                    var data = SourceGamesHelper.Encrypt(new[] { sourceGame }, _desService);
+                    // Send data  
+                    _actionResult = new SocketActionSend(client, _displayMessage, "Send {0} bytes to server.\n", data).Run();
                     if (!_actionResult.Success)
                         return;
                 }
