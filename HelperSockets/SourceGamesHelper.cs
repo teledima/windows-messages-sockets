@@ -60,7 +60,7 @@ namespace HelperSockets
             }
         }
 
-        public async static void ExportToPostgres(IEnumerable<SourceGames> sourceGames)
+        public static void ExportToPostgres(IEnumerable<SourceGames> sourceGames)
         {
             // export order: Category -> Game -> GameCategory -> Achievement -> DownloadableContent
             using var db = new GamesContext();
@@ -70,13 +70,13 @@ namespace HelperSockets
 
                 if (!string.IsNullOrEmpty(sourceGame.CategoriesName))
                 {
-                    var categories = await db.Categories.ToListAsync();
+                    var categories = db.Categories.ToList();
                     category = categories.Find(category => category.Name.ToLower() == sourceGame.CategoriesName.ToLower());
 
                     // if we didn't find a category, insert a new one
                     if (category == null)
                     {
-                        var add_result = await db.Categories.AddAsync(new Category() { Name = sourceGame.CategoriesName });
+                        var add_result = db.Categories.Add(new Category() { Name = sourceGame.CategoriesName });
                         category = add_result.Entity;
                     }
                 }
@@ -85,20 +85,20 @@ namespace HelperSockets
                 if (!string.IsNullOrEmpty(sourceGame.GamesName))
                 {
 
-                    var games = await db.Games.ToListAsync();
+                    var games = db.Games.ToList();
                     var game = games.Find(game => game.Name.ToLower() == sourceGame.GamesName.ToLower());
 
                     // if we didn't find a game, insert a new one
                     if (game == null)
                     {
-                        var add_result = await db.Games.AddAsync(new Games() { Name = sourceGame.GamesName });
+                        var add_result = db.Games.Add(new Games() { Name = sourceGame.GamesName });
                         game = add_result.Entity;
                     }
 
-                    var gameCategories = await db.GamesCategories
+                    var gameCategories = db.GamesCategories
                                                 .Include(gameCategory => gameCategory.Game)
                                                 .Include(gameCategory => gameCategory.Category)
-                                                .ToListAsync();
+                                                .ToList();
 
                     // if sourceGame.CategoriesName is null then category the variable will remain null and we will try to insert a new category, which will result in an error
                     if (category != null)
@@ -107,7 +107,7 @@ namespace HelperSockets
 
                         if (gameCategory == null)
                         {
-                            var add_result = await db.GamesCategories.AddAsync(new GamesCategory() { Game = game, Category = category });
+                            var add_result = db.GamesCategories.Add(new GamesCategory() { Game = game, Category = category });
                             gameCategory = add_result.Entity;
                         }
                     }
@@ -115,26 +115,26 @@ namespace HelperSockets
 
                     if (!string.IsNullOrEmpty(sourceGame.AchievementsName))
                     {
-                        var achievements = await db.Achievements.ToListAsync();
+                        var achievements = db.Achievements.ToList();
                         var achievement = achievements.Find(achievement => achievement.Name.ToLower() == sourceGame.AchievementsName.ToLower());
 
                         // if we didn't find a achievement, insert a new one
                         if (achievement == null)
-                            await db.Achievements.AddAsync(new Achievement() { Name = sourceGame.AchievementsName, Game = game });
+                            db.Achievements.Add(new Achievement() { Name = sourceGame.AchievementsName, Game = game });
                     }
 
                     if (!string.IsNullOrEmpty(sourceGame.DownloadableContentsName))
                     {
-                        var downloadableContents = await db.DownloadableContents.ToListAsync();
+                        var downloadableContents = db.DownloadableContents.ToList();
                         var downloadableContent = downloadableContents.Find(downloadableContent => downloadableContent.Name.ToLower() == sourceGame.DownloadableContentsName.ToLower());
 
                         // if we didn't find a downloadable content, insert a new one
                         if (downloadableContent == null)
-                            await db.DownloadableContents.AddAsync(new DownloadableContents() { Name = sourceGame.DownloadableContentsName, Game = game });
+                            db.DownloadableContents.Add(new DownloadableContents() { Name = sourceGame.DownloadableContentsName, Game = game });
                     }
                 }
                 // save changes for each row
-                await db.SaveChangesAsync();
+                db.SaveChanges();
             }
         }
 

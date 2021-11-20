@@ -68,7 +68,7 @@ namespace HelperSockets
             try
             {
                 // Export data
-                Task.Run(() => SourceGamesHelper.ExportToPostgres(sourceGames));
+                SourceGamesHelper.ExportToPostgres(sourceGames);
             }
             catch (Exception e)
             {

@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Text;
 using HelperSockets;
 using RabbitMQ.Client.Events;
+using System.Threading.Tasks;
+using System;
 
 namespace MQServer
 {
@@ -48,7 +50,15 @@ namespace MQServer
                             displayMessage.Display(string.Format("Запись получена, размер: {0} байт", data.Length));
 
                             var rows = SourceGamesHelper.Parse(data);
-                            SourceGamesHelper.ExportToPostgres(rows);
+                            try
+                            {
+                                // Export data
+                                SourceGamesHelper.ExportToPostgres(rows);
+                            }
+                            catch (Exception e)
+                            {
+                                displayMessage.Display(e.Message);
+                            }
                         };
                         displayMessage.Display("Все данные получены");
                         string tag = channel.BasicConsume("SourceGames", true, consumer);

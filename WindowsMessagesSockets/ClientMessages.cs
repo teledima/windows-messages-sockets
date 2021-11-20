@@ -47,8 +47,10 @@ namespace WindowsMessagesSockets
                         var encryptedData = SourceGamesHelper.Encrypt(new List<SourceGames>() { sourceGame }, desServive);
                         MQServerHelper.SendData(channel, "SourceGames", encryptedData);
                         _displayMessage.Display(string.Format("Запись отправлена, размер: {0} байт\n", encryptedData.Length));
-                        // SourceGamesHelper.ClearSourceGames(Properties.Settings.Default["source_filepath"].ToString(), new List<SourceGames>() { sourceGame });
+                        
                     }
+
+                    SourceGamesHelper.ClearSourceGames(Properties.Settings.Default["source_filepath"].ToString());
                 }
                 _displayMessage.Display("Все данные отправлены.\n");
             }
