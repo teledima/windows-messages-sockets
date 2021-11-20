@@ -36,15 +36,15 @@ namespace WindowsMessagesSockets
                     _displayMessage.Display("Получен RSA ключ из сервера\n");
 
                     // Send DES key
-                    var desServive = new DesService();
-                    byte[] DESEncrypt = RSA.Encrypt(desServive.Serialize(), false);
-                    MQServerHelper.SendData(channel, "DES", DESEncrypt);
+                    var aesServive = new AesService();
+                    byte[] AESEncrypt = RSA.Encrypt(aesServive.Serialize(), false);
+                    MQServerHelper.SendData(channel, "DES", AESEncrypt);
                     _displayMessage.Display("Отправлен DES ключ серверу\n");
 
                     // Send rows
                     foreach (var sourceGame in sourceGames)
                     {
-                        var encryptedData = SourceGamesHelper.Encrypt(new List<SourceGames>() { sourceGame }, desServive);
+                        var encryptedData = SourceGamesHelper.Encrypt(new List<SourceGames>() { sourceGame }, aesServive);
                         MQServerHelper.SendData(channel, "SourceGames", encryptedData);
                         _displayMessage.Display(string.Format("Запись отправлена, размер: {0} байт\n", encryptedData.Length));
                         

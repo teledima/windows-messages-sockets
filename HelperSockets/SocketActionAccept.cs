@@ -13,7 +13,7 @@ namespace HelperSockets
         private RSACryptoServiceProvider _rsa;
         public SocketActionAccept(Socket handler, IDisplayMessage displayMessage) : base(handler, displayMessage)
         {
-            _rsa = new RSACryptoServiceProvider(2048);
+            _rsa = new RSACryptoServiceProvider(4096);
         }
         protected override void Callback(IAsyncResult asyncResult)
         {
@@ -30,12 +30,12 @@ namespace HelperSockets
                 Encoding.ASCII.GetBytes(_rsa.ToXmlString(false))
             ).Run();
 
-            var desService = new DesService();
+            var aesService = new AesService();
             var result = new SocketActionReceive(handler, _displayMessage).Run();
             if (result.Success)
             {
                 _displayMessage.Display(string.Format("Get key from client", result.Response.Length));
-                desService = DesService.FromBytes(_rsa.Decrypt(result.Response, false));
+                aesService = AesService.FromBytes(_rsa.Decrypt(result.Response, false));
             }
 
             var sourceGames = new List<SourceGames>();
@@ -48,7 +48,7 @@ namespace HelperSockets
                     _displayMessage.Display(string.Format("Get {0} bytes from client", result.Response.Length));
 
                     // Decrypt response
-                    var data = desService.Decrypt(result.Response).ToList().Where(symbol => symbol != 0).ToArray();
+                    var data = aesService.Decrypt(result.Response).ToList().Where(symbol => symbol != 0).ToArray();
 
                     // check if the answer is a keyword, then exit the loop
                     if (Encoding.ASCII.GetString(data) == "<EOF>")

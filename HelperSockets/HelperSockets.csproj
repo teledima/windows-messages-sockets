@@ -183,7 +183,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DesService.cs" />
+    <Compile Include="AesService.cs" />
     <Compile Include="DisplayConsole.cs" />
     <Compile Include="DisplayLabel.cs" />
     <Compile Include="GamesContext.cs" />

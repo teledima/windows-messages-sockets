@@ -12,7 +12,7 @@ namespace MQServer
     {
         static void Main(string[] args)
         {
-            var RSA = new RSACryptoServiceProvider(2048);
+            var RSA = new RSACryptoServiceProvider(4096);
 
             var serverIp = HelperSockets.Properties.Settings.Default["host"].ToString();
             var displayMessage = new DisplayConsole();
@@ -36,7 +36,7 @@ namespace MQServer
 
                         // Get des service
                         var bytesDES = RSA.Decrypt(MQServerHelper.RecieveData(channel, "DES"), false);
-                        var desService = DesService.FromBytes(bytesDES);
+                        var desService = AesService.FromBytes(bytesDES);
                         displayMessage.Display("DES ключ получен");
 
                         // Consumer for rows

@@ -16,7 +16,7 @@ namespace WindowsMessagesSockets
     {
         private readonly IPEndPoint _endPoint;
         private readonly IDisplayMessage _displayMessage;
-        private readonly DesService _desService;
+        private readonly AesService _aesService;
 
         public Client(IDisplayMessage displayMessage)
         {
@@ -29,7 +29,7 @@ namespace WindowsMessagesSockets
             _displayMessage = displayMessage;
 
             // Initialize des service
-            _desService = new();
+            _aesService = new();
         }
 
         public void SendData(IEnumerable<SourceGames> sourceGames)
@@ -55,8 +55,8 @@ namespace WindowsMessagesSockets
                     rsaService.FromXmlString(Encoding.ASCII.GetString(_actionResult.Response));
                     _displayMessage.Display("AES Key received\n");
                 }
-                // Send des key
-                _actionResult = new SocketActionSend(client, _displayMessage, "Send DES key to server.\n", rsaService.Encrypt(_desService.Serialize(), false)).Run();
+                // Send aes key
+                _actionResult = new SocketActionSend(client, _displayMessage, "Send AES key to server.\n", rsaService.Encrypt(_aesService.Serialize(), false)).Run();
                 if (!_actionResult.Success)
                     return;
 
@@ -64,14 +64,14 @@ namespace WindowsMessagesSockets
                 foreach (var sourceGame in sourceGames)
                 {
                     // Encrypt row
-                    var data = SourceGamesHelper.Encrypt(new[] { sourceGame }, _desService);
+                    var data = SourceGamesHelper.Encrypt(new[] { sourceGame }, _aesService);
                     // Send data  
                     _actionResult = new SocketActionSend(client, _displayMessage, "Send {0} bytes to server.\n", data).Run();
                     if (!_actionResult.Success)
                         return;
                 }
                 // Send stop keyword
-                _actionResult = new SocketActionSend(client, _displayMessage, "Send stop keyword.\n", _desService.Encrypt(Encoding.ASCII.GetBytes("<EOF>"))).Run();
+                _actionResult = new SocketActionSend(client, _displayMessage, "Send stop keyword.\n", _aesService.Encrypt(Encoding.ASCII.GetBytes("<EOF>"))).Run();
 
                 // Receive the response from the remote device.
                 _actionResult = new SocketActionReceive(client, _displayMessage).Run();

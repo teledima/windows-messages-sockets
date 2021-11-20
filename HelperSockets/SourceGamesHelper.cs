@@ -16,7 +16,7 @@ namespace HelperSockets
             return db.SourceGames.ToList().Where(game => game != null);
         }
 
-        public static byte[] Encrypt(IEnumerable<SourceGames> sourceGames, DesService desService)
+        public static byte[] Encrypt(IEnumerable<SourceGames> sourceGames, AesService desService)
         {
             StringBuilder stringBuilder = new();
             foreach (SourceGames game in sourceGames)

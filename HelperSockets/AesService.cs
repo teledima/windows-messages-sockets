@@ -6,22 +6,23 @@ using System.Security.Cryptography;
 namespace HelperSockets
 {
     [Serializable]
-    public class DesService
+    public class AesService
     {
         public byte[] Key { get; set; }
 
         public byte[] IV { get; set; }
 
-        public DesService()
+        public AesService()
         {
-            var desService = DES.Create();
-            desService.GenerateKey();
-            desService.GenerateIV();
+            var aesService = Aes.Create();
+            aesService.KeySize = 256;
+            aesService.GenerateKey();
+            aesService.GenerateIV();
 
-            Key = desService.Key;
-            IV = desService.IV;
+            Key = aesService.Key;
+            IV = aesService.IV;
         }
-        public DesService(byte[] key, byte[] iv)
+        public AesService(byte[] key, byte[] iv)
         {
             Key = key;
             IV = iv;
@@ -31,7 +32,7 @@ namespace HelperSockets
         {
             if (data.Length == 0)
                 return new byte[0];
-            using var encryptor = DES.Create().CreateEncryptor(Key, IV);
+            using var encryptor = Aes.Create().CreateEncryptor(Key, IV);
             using var mStream = new MemoryStream();
             using var cStream = new CryptoStream(mStream, encryptor, CryptoStreamMode.Write);
             cStream.Write(data, 0, data.Length);
@@ -42,7 +43,7 @@ namespace HelperSockets
 
         public byte[] Decrypt(byte[] data)
         {
-            using var decryptor = DES.Create().CreateDecryptor(Key, IV);
+            using var decryptor = Aes.Create().CreateDecryptor(Key, IV);
             using var mStream = new MemoryStream(data);
             using var cStream = new CryptoStream(mStream, decryptor, CryptoStreamMode.Read);
 
@@ -59,11 +60,11 @@ namespace HelperSockets
             return mStream.ToArray();
         }
 
-        public static DesService FromBytes(byte[] data)
+        public static AesService FromBytes(byte[] data)
         {
             var binaryFormatter = new BinaryFormatter();
             using var mStream = new MemoryStream(data);
-            return (DesService)binaryFormatter.Deserialize(mStream);
+            return (AesService)binaryFormatter.Deserialize(mStream);
         }
     }
 }
