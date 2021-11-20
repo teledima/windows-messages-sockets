@@ -45,10 +45,8 @@ namespace HelperSockets
                 _response.AddRange(_buffer.ToList().GetRange(0, bytesRead));
                 if (handler.Available > 0 && (_messageSize != null && _buffer.Length < _messageSize || _messageSize == null))
                 {
-                    if (_messageSize != null && handler.Available < (int)(_messageSize - _buffer.Length))
-                        BufferSize = (int)(_messageSize - _buffer.Length);
-                    else
-                        BufferSize = handler.Available;
+                    if (_messageSize != null && handler.Available < (int)(_messageSize - _response.Count))
+                        BufferSize = (int)(_messageSize - _response.Count);
                     // Get the rest of the data.  
                     handler.BeginReceive(_buffer, 0, BufferSize, 0,
                         new AsyncCallback(Callback), handler);
