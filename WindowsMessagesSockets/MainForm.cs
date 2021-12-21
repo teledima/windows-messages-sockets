@@ -9,12 +9,13 @@ namespace WindowsMessagesSockets
 {
     public partial class MainForm : Form
     {
-        private readonly string initial_directory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+        private readonly string initial_directory = new DirectoryInfo(Directory.GetCurrentDirectory()).FullName;
         public MainForm()
         {
             InitializeComponent();
             labelHistory.MaximumSize = new Size { Height = labelHistory.MaximumSize.Height, Width = Width - 50};
             openDbFileDialog.InitialDirectory = initial_directory;
+            openDbFileDialog.Filter = "database file|*.db";
         }
 
         private void buttonSelectFile_Click(object sender, EventArgs e)
@@ -66,9 +67,14 @@ namespace WindowsMessagesSockets
                     // Send data to server
                     client.SendData(sourceGames);
                 }
-                else
+                else if (radioButtonMessages.Checked)
                 {
-                    var client = new ClientMessages(displayMessage);
+                    var client = new ClientMessage(displayMessage);
+                    client.SendData(sourceGames);
+                }
+                else if (radioButtonGrpc.Checked)
+                {
+                    var client = new ClientGrpc(displayMessage);
                     client.SendData(sourceGames);
                 }
             }

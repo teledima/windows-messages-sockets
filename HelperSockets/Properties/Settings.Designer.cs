@@ -34,16 +34,7 @@ namespace HelperSockets.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
-        public string host {
-            get {
-                return ((string)(this["host"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("11000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5001")]
         public int port {
             get {
                 return ((int)(this["port"]));
@@ -61,10 +52,10 @@ namespace HelperSockets.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("128")]
-        public int des_keysize {
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.1.44")]
+        public string host {
             get {
-                return ((int)(this["des_keysize"]));
+                return ((string)(this["host"]));
             }
         }
     }

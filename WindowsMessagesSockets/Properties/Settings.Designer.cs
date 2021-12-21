@@ -34,5 +34,14 @@ namespace WindowsMessagesSockets.Properties {
                 this["source_filepath"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("server.crt")]
+        public string certificate_path {
+            get {
+                return ((string)(this["certificate_path"]));
+            }
+        }
     }
 }

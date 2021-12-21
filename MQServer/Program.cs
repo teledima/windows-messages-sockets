@@ -5,7 +5,8 @@ using HelperSockets;
 using RabbitMQ.Client.Events;
 using System.Threading.Tasks;
 using System;
-
+// Run docker
+// docker run -it --rm -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.9-management
 namespace MQServer
 {
     class Program
@@ -22,9 +23,11 @@ namespace MQServer
             var factory = new ConnectionFactory()
             {
                 HostName = serverIp,
-                Password = "guest",
-                UserName = "guest"
-            };
+                Password = "admin",
+                UserName = "admin",
+                RequestedHeartbeat = new TimeSpan(0, 0, 60),
+                Port = 5672
+        };
             using (var connection = factory.CreateConnection())
             {
                 while (true)

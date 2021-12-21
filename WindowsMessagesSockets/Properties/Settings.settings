@@ -5,5 +5,8 @@
     <Setting Name="source_filepath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="certificate_path" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">server.crt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

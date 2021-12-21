@@ -43,7 +43,7 @@ namespace HelperSockets
 
                 // Move buffer to response.
                 _response.AddRange(_buffer.ToList().GetRange(0, bytesRead));
-                if (handler.Available > 0 && (_messageSize != null && _buffer.Length < _messageSize || _messageSize == null))
+                if (handler.Available > 0 && _response.Count < MessageSize)
                 {
                     if (_messageSize != null && handler.Available < (int)(_messageSize - _response.Count))
                         BufferSize = (int)(_messageSize - _response.Count);
